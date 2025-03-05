@@ -1,0 +1,163 @@
+# Telegram bot 模块
+telegram:
+  # 从 Bot Father 获取的 token
+  token: ""
+  # Bot 用户名，不包含 "@" 前缀
+  username: ""
+  # 管理员的 ID，可以有多个
+  admin_ids:
+    - 12345
+
+# 数据库配置
+db:
+  host: 127.0.0.1
+  user: shubot
+  password: shubot
+  db: shubot
+  port: 3306
+
+# 书模块
+book:
+  download_path: /root/shuku
+  allowed_extensions:
+    - .txt
+    - .epub
+  points_per_book: 10
+  book_repo:
+    url: https://shuku.sf.uk
+    username: hesu
+    password: aa1233
+    notice: 请不要上传无关内容不要批量/打包下载
+
+# 猫娘模块
+salve_rules:
+  init_phrase: 见过主人，喵~
+  daily_phrase: 喵
+  max_retry: 3
+
+# 抢劫模块
+rob:
+  # 每日抢劫次数
+  daily_limit: 5
+  # 逃脱概率
+  escape_chance: 0.2
+  # 骰子范围
+  dice_range:
+    min: 1
+    max: 6
+  # 高等级的点数加成
+  stage_bonus: 3
+  # 惩罚概率
+  penalty_ratio:
+    min: 0.1
+    max: 0.3
+  # 冷却时间
+  cooldown: 60
+
+# 帮派模块
+gang:
+  base_donation: 100
+  reset_hour: 21
+  reset_minute: 33
+
+# 随机事件
+random_events:
+  - id: "lost_points"
+    name: 灵石丢失
+    chance: 0.005
+  - id: "stage_up"
+    name: 小境界突破
+    chance: 0.002
+  - id: "stage_down"
+    name: 境界跌落
+    chance: 0.003
+  - id: "discovery"
+    name: 上古遗迹
+    chance: 0.002
+
+# 头衔设置
+cultivation:
+  - 凡夫俗子
+  - 后天前期
+  - 后天中期
+  - 后天后期
+  - 先天前期
+  - 先天中期
+  - 先天后期
+  - 练气前期
+  - 练气中期
+  - 练气后期
+  - 筑基前期
+  - 筑基中期
+  - 筑基后期
+  - 金丹前期
+  - 金丹中期
+  - 金丹后期
+  - 元婴前期
+  - 元婴中期
+  - 元婴后期
+  - 化神前期
+  - 化神中期
+  - 化神后期
+  - 炼虚前期
+  - 炼虚中期
+  - 炼虚后期
+  - 合体前期
+  - 合体中期
+  - 合体后期
+  - 大乘前期
+  - 大乘中期
+  - 大乘后期
+  - 渡劫前期
+  - 渡劫中期
+  - 渡劫后期
+
+# 大突破概率
+major_breakthroughs:
+  - level: 3
+    chance: 1.0
+  - level: 6
+    chance: 0.9
+  - level: 9
+    chance: 0.8
+  - level: 12
+    chance: 0.7
+  - level: 15
+    chance: 0.6
+  - level: 18
+    chance: 0.5
+  - level: 21
+    chance: 0.4
+  - level: 24
+    chance: 0.3
+  - level: 27
+    chance: 0.2
+  - level: 30
+    chance: 0.1
+
+# 刮刮乐
+lottery:
+  # 中奖概率，0-1 之间的小数
+  chance: 0.1
+  # 抽奖次数
+  daily_limit: 5
+  # 彩票选数范围
+  number_range:
+    min: 1
+    max: 20
+  # 选择数字的数量
+  select_count: 5
+  # 彩票选项
+  options:
+    - cost: 3
+      prize: 30
+    - cost: 10
+      prize: 100
+    - cost: 50
+      prize: 500
+
+region_names:
+  hk: 香港
+  jp: 日本
+  sg: 新加坡
+  us: 美国

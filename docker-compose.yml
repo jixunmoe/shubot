@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mariadb:11.7.2
+    environment:
+      MARIADB_ROOT_PASSWORD: shubot
+      MARIADB_DATABASE: shubot
+      MARIADB_USER: shubot
+      MARIADB_PASSWORD: shubot
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
