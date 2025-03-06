@@ -53,6 +53,34 @@ rob:
     max: 0.3
   # 冷却时间
   cooldown: 60
+  messages:
+    too_weak: |-
+      💢 {robber}（{robber_stage}）妄图挑战{victim_stage}大能
+      ⚡ 虚空中传来一声冷哼：区区小辈，不知天高地厚！
+    too_strong: |-
+      👎 {robber}（{robber_stage}）竟想欺凌{victim_stage}修士
+      💢 围观修士纷纷摇头：你要点B脸行不？
+    escapes:
+      - "🏃♂️ {victim} 施展神行百变，瞬间消失无踪！"
+      - "🕶️ {victim} 留下替身木偶戏耍了 {robber}"
+      - "🌫️ 一阵迷雾过后，{victim} 早已不见踪影"
+    tie: ⚔️ 双方势均力敌！{robber} 与 {victim} 各自退去
+    rob_action_descriptions:
+      - "🎲 {winner} 力压菜鸡！{loser} 要如何应对？"
+      - "🏆 胜负已分！{loser} 面临 {winner} 的威胁"
+      - "💥 {loser} 被彻底压制！请选择求饶方式："
+    steal_complete:
+      - "💰 {loser} 的储物袋破了个洞，掉出 {rob_amount} 灵石！",
+      - "⚔️ 寒光一闪，{loser} 被迫交出 {rob_amount} 灵石！"
+    steal_empty:
+      - "🔍 {loser} 身上一无所有，{robber} 只好失望而归"
+      - "💸 {loser} 的储物袋空空如也！"
+    fight_win:
+      - "🍃 绝处逢生！{loser} 逃出生天"
+      - "🌈 虹光乍现，{loser} 消失于虚空"
+    fight_lose:
+      - "💀 道基尽毁！{loser} 修为尽失"
+      - "🪦 生死道消，{loser} 转世重修"
 
 # 帮派模块
 gang:
