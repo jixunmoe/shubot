@@ -6,7 +6,7 @@ from telegram.ext import Application, JobQueue
 
 from shubot.command.checkin import CheckinCommand
 from shubot.command.lottery import LotteryCommand
-from shubot.command.my_points import MyStatsCommand
+from shubot.command.user_info import UserInfoCommand
 from shubot.command.rob import RobCommand
 from shubot.command.slave import SlaveCommand
 from shubot.config import Config
@@ -42,7 +42,7 @@ class ShuBot:
 
         self._command_handlers.append(SlaveCommand(self._app, config.slave_rules))
         self._command_handlers.append(CheckinCommand(self._app, config))
-        self._command_handlers.append(MyStatsCommand(self._app, config))
+        self._command_handlers.append(UserInfoCommand(self._app, config))
         self._command_handlers.append(RobCommand(self._app, config))
         self._command_handlers.append(LotteryCommand(self._app, config))
 

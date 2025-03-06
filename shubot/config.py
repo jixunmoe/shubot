@@ -219,6 +219,30 @@ class LotteryConfig:
 
 
 @dataclass
+class LeaderboardMessages:
+    """排行榜消息配置"""
+
+    banner: str = field(default="🏯【合书帮·天骄榜】🏯")
+    """排行榜标题"""
+    entry: str = field(default="{rank} {name} - 等级 {stage}，积分 {points}")
+    """排行榜条目模板"""
+    separator: str = field(default="\n")
+    """排行榜条目分隔符"""
+    footer: str = field(default="")
+    """排行榜尾部"""
+
+
+@dataclass
+class LeaderboardConfig:
+    """排行榜配置"""
+
+    top_count: int = field(default=10)
+    """排行榜显示的数量，最大 20"""
+
+    messages: LeaderboardMessages = field(default_factory=LeaderboardMessages)
+
+
+@dataclass
 class Config:
     """总配置文件对象"""
 
@@ -241,5 +265,7 @@ class Config:
     """大突破配置"""
     lottery: LotteryConfig = field(default_factory=LotteryConfig)
     """刮刮乐(乐透)配置"""
+    leaderboard: LeaderboardConfig = field(default_factory=LeaderboardConfig)
+    """排行榜配置"""
     region_names: dict[str, str] = field(default_factory=dict)
     """意义不明的区域 id 到名称的映射"""

@@ -53,6 +53,11 @@ class DatabaseManager:
             await cursor.execute(query, args)
             return await cursor.fetchone()
 
+    async def find_many(self, query: str, args: tuple[Any, ...] | None = None) -> list[tuple[Any, ...]]:
+        async with self.get_cursor() as cursor:
+            await cursor.execute(query, args)
+            return await cursor.fetchall()
+
     async def update(self, query: str, args: tuple[Any, ...] | None = None) -> int:
         """执行更新操作，返回受影响行数"""
         async with self.acquire() as conn:
