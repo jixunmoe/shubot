@@ -2,7 +2,7 @@ import logging
 import random
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from typing import AsyncIterator, Optional, Any
+from typing import AsyncIterator, Any
 
 import aiomysql
 
@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseManager:
-    _instance: 'DatabaseManager'
+    _instance: "DatabaseManager"
     """全局数据库对象"""
 
     @staticmethod
-    def get_instance() -> 'DatabaseManager':
+    def get_instance() -> "DatabaseManager":
         return DatabaseManager._instance
 
     _pool: None | aiomysql.Pool
@@ -35,7 +35,7 @@ class DatabaseManager:
             user=config.user,
             password=config.password,
             db=config.db,
-            autocommit=False
+            autocommit=False,
         )
 
     @asynccontextmanager
@@ -47,8 +47,7 @@ class DatabaseManager:
     async def is_group_authorized(self, group_id: int) -> bool:
         async with self.get_cursor() as cursor:
             await cursor.execute(
-                "SELECT 1 FROM authorized_groups WHERE group_id = %s",
-                (group_id,)
+                "SELECT 1 FROM authorized_groups WHERE group_id = %s", (group_id,)
             )
             return bool(await cursor.fetchone())
 
@@ -66,7 +65,7 @@ class DatabaseManager:
                     """INSERT INTO authorized_groups (group_id, group_name)
                         VALUES (%s, %s)
                         ON DUPLICATE KEY UPDATE group_name = VALUES(group_name)""",
-                    (group_id, group_name)
+                    (group_id, group_name),
                 )
             await conn.commit()
 
@@ -77,23 +76,22 @@ class DatabaseManager:
                 await cursor.execute(
                     """INSERT IGNORE INTO users (user_id, points) 
                        VALUES (%s, 0)""",
-                    (user_id,)
+                    (user_id,),
                 )
                 await cursor.execute(
                     """INSERT IGNORE INTO user_cultivation (user_id) 
                        VALUES (%s)""",
-                    (user_id,)
+                    (user_id,),
                 )
 
                 await cursor.execute(
-                    "SELECT points FROM users WHERE user_id = %s",
-                    (user_id,)
+                    "SELECT points FROM users WHERE user_id = %s", (user_id,)
                 )
                 points_row = await cursor.fetchone()
 
                 await cursor.execute(
                     "SELECT stage, pills, next_cost FROM user_cultivation WHERE user_id = %s",
-                    (user_id,)
+                    (user_id,),
                 )
                 cult_row = await cursor.fetchone()
 
@@ -103,7 +101,7 @@ class DatabaseManager:
                     "points": points_row[0] if points_row else 0,
                     "stage": cult_row[0] if cult_row else 0,
                     "pills": cult_row[1] if cult_row else 0,
-                    "next_cost": cult_row[2] if cult_row else 10
+                    "next_cost": cult_row[2] if cult_row else 10,
                 }
 
     async def remove_authorized_group(self, group_id: int):
@@ -111,8 +109,7 @@ class DatabaseManager:
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
-                    "DELETE FROM authorized_groups WHERE group_id = %s",
-                    (group_id,)
+                    "DELETE FROM authorized_groups WHERE group_id = %s", (group_id,)
                 )
             await conn.commit()
 
@@ -129,23 +126,29 @@ class DatabaseManager:
         async with pool.acquire() as conn:
             try:
                 async with conn.cursor() as cursor:
-                    await cursor.execute("""
+                    await cursor.execute(
+                        """
                         SELECT times_used FROM gua_records
                         WHERE user_id = %s AND date = %s
                         FOR UPDATE
-                    """, (user_id, today))
+                    """,
+                        (user_id, today),
+                    )
                     result = await cursor.fetchone()
 
                     current = result[0] if result else 0
                     if current >= daily_limit:
                         return False
 
-                    await cursor.execute("""
+                    await cursor.execute(
+                        """
                         INSERT INTO gua_records (user_id, date, times_used)
                         VALUES (%s, %s, 1)
                         ON DUPLICATE KEY UPDATE
                         times_used = times_used + 1
-                    """, (user_id, today))
+                    """,
+                        (user_id, today),
+                    )
 
                     await conn.commit()
                     return True
@@ -167,7 +170,7 @@ class DatabaseManager:
                     """SELECT CONVERT_TZ(last_checkin, 
                         @@session.time_zone, '+00:00') 
                        FROM users WHERE user_id = %s""",
-                    (user_id,)
+                    (user_id,),
                 )
                 result = await cursor.fetchone()
 
@@ -180,10 +183,7 @@ class DatabaseManager:
                 # 生成随机积分
                 points = random.randint(1, 10)
 
-                await cursor.execute(
-                    """""",
-                    (user_id, username, points)
-                )
+                await cursor.execute("""""", (user_id, username, points))
                 await conn.commit()
                 return points, True
 
@@ -192,8 +192,7 @@ class DatabaseManager:
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
-                    "SELECT points FROM users WHERE user_id = %s FOR UPDATE",
-                    (user_id,)
+                    "SELECT points FROM users WHERE user_id = %s FOR UPDATE", (user_id,)
                 )
                 result = await cursor.fetchone()
 
@@ -202,7 +201,7 @@ class DatabaseManager:
 
                 await cursor.execute(
                     "UPDATE users SET points = points - %s WHERE user_id = %s",
-                    (amount, user_id)
+                    (amount, user_id),
                 )
                 await conn.commit()
                 return True
@@ -216,17 +215,23 @@ class DatabaseManager:
                        VALUES (%s, 0, 0, 10)
                        ON DUPLICATE KEY UPDATE
                        user_id = VALUES(user_id)""",
-                    (user_id,)
+                    (user_id,),
                 )
                 await cursor.execute(
                     "SELECT stage, pills, next_cost FROM user_cultivation WHERE user_id = %s",
-                    (user_id,)
+                    (user_id,),
                 )
                 result = await cursor.fetchone()
                 await conn.commit()
-                return dict(zip(['stage', 'pills', 'next_cost'], result)) if result else None
+                return (
+                    dict(zip(["stage", "pills", "next_cost"], result))
+                    if result
+                    else None
+                )
 
-    async def update_cultivation_stage(self, user_id: int, new_stage: int, new_cost: int):
+    async def update_cultivation_stage(
+        self, user_id: int, new_stage: int, new_cost: int
+    ):
         pool = self.get_pool()
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
@@ -234,7 +239,7 @@ class DatabaseManager:
                     """UPDATE user_cultivation 
                        SET stage = %s, next_cost = %s 
                        WHERE user_id = %s""",
-                    (new_stage, new_cost, user_id)
+                    (new_stage, new_cost, user_id),
                 )
                 await conn.commit()
 
@@ -246,7 +251,7 @@ class DatabaseManager:
                     """UPDATE user_cultivation 
                        SET pills = pills + %s 
                        WHERE user_id = %s""",
-                    (amount, user_id)
+                    (amount, user_id),
                 )
                 await conn.commit()
 
@@ -255,8 +260,7 @@ class DatabaseManager:
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
-                    "SELECT points FROM users WHERE user_id = %s",
-                    (user_id,)
+                    "SELECT points FROM users WHERE user_id = %s", (user_id,)
                 )
                 result = await cursor.fetchone()
                 return result[0] if result else 0
@@ -270,17 +274,16 @@ class DatabaseManager:
                        VALUES (%s, %s)
                        ON DUPLICATE KEY UPDATE
                        username = VALUES(username)""",
-                    (user_id, max(delta, 0))
+                    (user_id, max(delta, 0)),
                 )
 
                 await cursor.execute(
                     "UPDATE users SET points = GREATEST(points + %s, 0) WHERE user_id = %s",
-                    (delta, user_id)
+                    (delta, user_id),
                 )
 
                 await cursor.execute(
-                    "SELECT points FROM users WHERE user_id = %s",
-                    (user_id,)
+                    "SELECT points FROM users WHERE user_id = %s", (user_id,)
                 )
                 result = await cursor.fetchone()
                 await conn.commit()
@@ -293,7 +296,9 @@ class DatabaseManager:
                 await cursor.execute("SELECT 1 FROM files WHERE md5 = %s", (md5,))
                 return bool(await cursor.fetchone())
 
-    async def update_user_points(self, user_id: int, username: str, points_delta: int = 10):
+    async def update_user_points(
+        self, user_id: int, username: str, points_delta: int = 10
+    ):
         # 更新积分
         pool = self.get_pool()
         async with pool.acquire() as conn:
@@ -304,7 +309,7 @@ class DatabaseManager:
                        ON DUPLICATE KEY UPDATE
                        points = points + VALUES(points),
                        username = VALUES(username)""",
-                    (user_id, username, points_delta)
+                    (user_id, username, points_delta),
                 )
             await conn.commit()
 
@@ -314,8 +319,7 @@ class DatabaseManager:
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
-                    "INSERT INTO files (md5, user_id) VALUES (%s, %s)",
-                    (md5, user_id)
+                    "INSERT INTO files (md5, user_id) VALUES (%s, %s)", (md5, user_id)
                 )
             await conn.commit()
 
@@ -325,30 +329,34 @@ class DatabaseManager:
         now = datetime.utcnow()
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                await cursor.execute("""
+                await cursor.execute(
+                    """
                     CREATE TABLE IF NOT EXISTS rob_records (
                         user_id BIGINT PRIMARY KEY,
                         last_rob TIMESTAMP,
                         count INT DEFAULT 0,
                         FOREIGN KEY (user_id) REFERENCES users(user_id)
                     )
-                """)
+                """
+                )
 
                 await cursor.execute(
-                    "SELECT last_rob FROM rob_records WHERE user_id = %s",
-                    (user_id,)
+                    "SELECT last_rob FROM rob_records WHERE user_id = %s", (user_id,)
                 )
                 result = await cursor.fetchone()
                 if result and (now - result[0]).seconds < cooldown:
                     return False
 
-                await cursor.execute("""
+                await cursor.execute(
+                    """
                     INSERT INTO rob_records (user_id, last_rob, count)
                     VALUES (%s, %s, 1)
                     ON DUPLICATE KEY UPDATE
                     last_rob = VALUES(last_rob),
                     count = IF(DATE(last_rob) != CURDATE(), 1, count + 1)
-                """, (user_id, now))
+                """,
+                    (user_id, now),
+                )
 
                 await conn.commit()
                 return True
@@ -359,8 +367,7 @@ class DatabaseManager:
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
-                    "SELECT count FROM rob_records WHERE user_id = %s",
-                    (user_id,)
+                    "SELECT count FROM rob_records WHERE user_id = %s", (user_id,)
                 )
                 result = await cursor.fetchone()
                 return result[0] if result else 0
@@ -377,7 +384,7 @@ class DatabaseManager:
                            ON DUPLICATE KEY UPDATE
                            points = points + 1,
                            username = VALUES(username)""",
-                        (user_id, username)
+                        (user_id, username),
                     )
                     await conn.commit()
                     return True
@@ -393,7 +400,7 @@ class DatabaseManager:
     async def update(self, query: str, args: tuple[Any, ...] | None = None) -> int:
         """执行更新操作，返回受影响行数"""
         async with self.acquire() as conn:
-            async with conn.cursor() as cursor: # type: aiomysql.Cursor
+            async with conn.cursor() as cursor:  # type: aiomysql.Cursor
                 await cursor.execute(query, args)
                 row_count = cursor.rowcount
                 await conn.commit()

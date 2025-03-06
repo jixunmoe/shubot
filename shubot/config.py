@@ -6,6 +6,7 @@ class IntRange:
     """
     最大值与最小值均包含在内。
     """
+
     min: int
     max: int
 
@@ -15,6 +16,7 @@ class FloatRange:
     """
     最大值与最小值均包含在内。
     """
+
     min: float
     max: float
 
@@ -24,6 +26,7 @@ class TelegramBotConfig:
     """
     Telegram 机器人配置
     """
+
     token: str
     username: str
     admin_ids: list[str]
@@ -32,6 +35,7 @@ class TelegramBotConfig:
 @dataclass
 class DatabaseConfig:
     """数据库配置 (MySQL / MariaDB)"""
+
     host: str = field(default="127.0.0.1")
     port: int = field(default=3306)
     db: str = field(default="shubot")
@@ -42,6 +46,7 @@ class DatabaseConfig:
 @dataclass
 class BookRepoConfig:
     """书库信息"""
+
     url: str
     username: str
     password: str
@@ -51,6 +56,7 @@ class BookRepoConfig:
 @dataclass
 class BookConfig:
     """书籍模块配置"""
+
     download_path: str
     """下载路径"""
     book_repo: BookRepoConfig
@@ -64,6 +70,7 @@ class BookConfig:
 @dataclass
 class SlaveRulesConfig:
     """猫娘模块配置"""
+
     init_phrase: str = field(default="见过主人，喵~")
     daily_phrase: str = field(default="喵")
     max_retry: int = field(default=3)
@@ -90,6 +97,7 @@ class RobConfig:
 @dataclass
 class GangConfig:
     """帮派模块配置"""
+
     base_donation: int = field(default=100)
     """上供基础点数"""
     reset_hour: int = field(default=21)
@@ -101,6 +109,7 @@ class GangConfig:
 @dataclass
 class RandomEventConfig:
     """随机事件配置"""
+
     id: str
     """事件 ID"""
     name: str
@@ -112,6 +121,7 @@ class RandomEventConfig:
 @dataclass
 class BreakThroughConfig:
     """突破事件配置"""
+
     level: int
     """顿悟时的等级"""
     chance: float
@@ -173,7 +183,9 @@ class Config:
     random_events: list[RandomEventConfig] = field(default_factory=list)
     cultivation: list[str] = field(default_factory=list)
     """头衔列表"""
-    major_breakthroughs: list[BreakThroughConfig] = field(default_factory=_default_major_breakthroughs)
+    major_breakthroughs: list[BreakThroughConfig] = field(
+        default_factory=_default_major_breakthroughs
+    )
     """大突破配置"""
     lottery: LotteryConfig = field(default_factory=LotteryConfig)
     """刮刮乐(乐透)配置"""
