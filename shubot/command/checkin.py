@@ -1,5 +1,3 @@
-import random
-from datetime import datetime, UTC
 from textwrap import dedent
 
 from telegram import Update, User
@@ -34,8 +32,8 @@ class CheckinCommand(BotCommandHandlerMixin):
         if message.chat.type not in ["group", "supergroup"]:
             return await message.reply_text("🌱 请在群组内签到哦~")
 
-        earned = random.randint(1, 10)
-        checkin_ok = await self._set_checkin(user, earned, datetime.now(UTC).date())
+        earned = self._rnd.randint(1, 10)
+        checkin_ok = await self._set_checkin(user, earned)
         if checkin_ok:
             reply_text = dedent(
                 f"""\
@@ -55,7 +53,7 @@ class CheckinCommand(BotCommandHandlerMixin):
         reply_msg = await reply(message, reply_text)
         defer_delete(context.job_queue, reply_msg, 10)
 
-    async def _set_checkin(self, user: User, points: int, date: datetime.date) -> bool:
+    async def _set_checkin(self, user: User, points: int) -> bool:
         await self._db.User.ensure_exists(user)
 
         updated = await self._db.update(
