@@ -38,19 +38,19 @@ class CheckinCommand(BotCommandHandlerMixin):
         checkin_ok = await self._set_checkin(user.id, earned, datetime.now(UTC).date())
         if checkin_ok:
             reply_text = dedent(
-                f"""
-                {CHECKIN_STAR_PATTERN[:earned]}
-                🎉 签到成功！
-                📅 今日获得 {earned} 积分
-                ⏳ 本条消息将在10秒后消失
-            """
+                f"""\
+                    {CHECKIN_STAR_PATTERN[:earned]}
+                    🎉 签到成功！
+                    📅 今日获得 {earned} 积分
+                    ⏳ 本条消息将在10秒后消失
+                """
             )
         else:
             reply_text = dedent(
+                """\
+                    ⏳ 今日已签到
+                    🕒 下次签到时间：次日 00:00 (UTC)
                 """
-                ⏳ 今日已签到
-                🕒 下次签到时间：次日 00:00 (UTC)
-            """
             )
         reply_msg = await reply(message, reply_text)
         defer_delete(context.job_queue, reply_msg, 10)
