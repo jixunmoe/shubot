@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from textwrap import dedent
+from traceback import format_exc, format_exception
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -58,5 +59,5 @@ class MyStatsCommand(BotCommandHandlerMixin):
             defer_delete(context.job_queue, sent_msg, timeout=10)
 
         except Exception as e:
-            logger.error(f"查询积分失败：{str(e)}")
+            logger.error(f"查询积分失败：{str(e)} - {format_exception(e)}")
             await message.reply_text("❌ 查询积分失败，请稍后再试")

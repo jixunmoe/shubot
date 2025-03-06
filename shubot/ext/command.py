@@ -1,5 +1,7 @@
 import asyncio
 import json
+from base64 import b64encode, b64decode
+from dataclasses import is_dataclass, asdict
 from datetime import datetime, UTC
 from random import SystemRandom
 from typing import cast, Any
@@ -57,20 +59,6 @@ class BotCommandHandlerMixin:
         if delete_reply:
             self.delete(reply_message, del_reply_timeout)
         return reply_message
-
-    @staticmethod
-    def encode_callback(prefix: str, data: Any) -> str:
-        """生成回调数据"""
-        return f"{prefix}_{json.dumps(data)}"
-
-    @staticmethod
-    def decode_callback(data: str, clz: Any = None) -> Any:
-        """解析回调数据。若是传递了 clz 参数，则将解码的数据做 kwargs 传入 clz"""
-        prefix, data = data.split("_", 1)
-        data = json.loads(data)
-        if clz:
-            return clz(**data)
-        return data
 
     @staticmethod
     def get_today():

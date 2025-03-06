@@ -159,14 +159,8 @@ class RobCommand(BotCommandHandlerMixin):
         tpl_var.update(winner=winner.full_name, loser=loser.full_name)
 
         # 让输家进行选择
-        btn_pay = InlineKeyboardButton(
-            "💰 破财消灾",
-            callback_data=self.encode_callback("rob", RobActionPayload("pay", winner.id, loser.id)),
-        )
-        btn_fight = InlineKeyboardButton(
-            "⚔️ 死战到底",
-            callback_data=self.encode_callback("rob", RobActionPayload("fight", winner.id, loser.id)),
-        )
+        btn_pay = InlineKeyboardButton("💰 破财消灾", callback_data=f"rob_pay_{winner.id}_{loser.id}")
+        btn_fight = InlineKeyboardButton("⚔️ 死战到底", callback_data=f"rob_fight_{winner.id}_{loser.id}")
         loser_action_msg = await context.bot.send_message(
             chat_id=message.chat_id,
             text=self._rnd.choice(self._config.rob.messages.rob_action_descriptions).format(**tpl_var),
@@ -178,32 +172,36 @@ class RobCommand(BotCommandHandlerMixin):
     async def _handle_rob_action(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 处理打劫输家的选择
         query = update.callback_query
-        await query.answer()
 
-        action = self.decode_callback(query.data, RobActionPayload)  # type: RobActionPayload
+        _, action, winner_id, loser_id = query.data.split("_")
+        winner_id, loser_id = int(winner_id), int(loser_id)
 
-        if query.from_user.id != action.loser_id:
-            loser_user = await context.bot.get_chat(action.loser_id)
-            return await query.answer(f"🚫 只有 {escape_markdown(loser_user.full_name,2)} 可以操作！", show_alert=True)
+        if query.from_user.id != loser_id:
+            loser_user = await context.bot.get_chat(loser_id)
+            return await query.answer(f"🚫 只有 {loser_user.full_name} 可以操作！", show_alert=True)
 
-        match action.action:
+        match action:
             case "pay":
-                return await self._handle_rob_action_pay(action, update, context)
+                await self._handle_rob_action_pay(winner_id, loser_id, update, context)
             case "fight":
-                return await self._handle_rob_action_fight(action, update, context)
+                await self._handle_rob_action_fight(winner_id, loser_id, update, context)
 
-    async def _handle_rob_action_pay(self, data: RobActionPayload, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        # Cleanup
+        self.delete(cast(Message, query.message), 8)
+
+    async def _handle_rob_action_pay(
+        self, winner_id: int, loser_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         """打劫输家选择「破财消灾」"""
         query = update.callback_query
         steal_ratio = self._rnd.uniform(*self._config.rob.penalty_ratio.to_tuple())
         (loser, (transfer_status, rob_amount, loser_pts, winner_pts)) = await asyncio.gather(
-            context.bot.get_chat(data.loser_id),
-            self._rob_transfer(data.loser_id, data.winner_id, steal_ratio),
+            context.bot.get_chat(loser_id),
+            self._rob_transfer(loser_id, winner_id, steal_ratio),
         )
 
         tpl_vars = dict(loser=loser.full_name, rob_amount=rob_amount, winner_pts=winner_pts, loser_pts=loser_pts)
 
-        self.delete(cast(Message, query.message), 8)
         match transfer_status:
             case RobTransferResult.LOSER_NO_MONEY | RobTransferResult.STOLEN_ZERO:
                 await query.edit_message_text(
@@ -217,7 +215,7 @@ class RobCommand(BotCommandHandlerMixin):
                 await query.edit_message_text("🚫 未知错误，请联系管理员 (SQL Exception)")
 
     async def _handle_rob_action_fight(
-        self, data: RobActionPayload, update: Update, context: ContextTypes.DEFAULT_TYPE
+        self, winner_id: int, loser_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE
     ):
         """打劫输家选择「死战到底」"""
         query = update.callback_query
@@ -227,15 +225,14 @@ class RobCommand(BotCommandHandlerMixin):
         ((winner_dice_message, winner_roll), (loser_dice_message, loser_roll), loser) = await asyncio.gather(
             self.dice_roll(message.chat_id),
             self.dice_roll(message.chat_id),
-            context.bot.get_chat(data.loser_id),
+            context.bot.get_chat(loser_id),
         )
-        self.delete(message, 8)
         self.delete(winner_dice_message, 5)
         self.delete(loser_dice_message, 5)
 
         reset_user_cond = Future()
         if winner_roll > loser_roll:
-            reset_user_cond = self._rob_reset_user(data.loser_id)
+            reset_user_cond = self._rob_reset_user(loser_id)
             template = self._rnd.choice(self._config.rob.messages.fight_lose)
         else:
             reset_user_cond.set_result(True)

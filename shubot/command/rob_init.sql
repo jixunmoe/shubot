@@ -1,5 +1,5 @@
 DROP PROCEDURE IF EXISTS shubot_rob_user;
-CREATE PROCEDURE shubot_rob_user(IN p_uid INT, IN p_cooldown INT, IN p_daily_max INT)
+CREATE PROCEDURE shubot_rob_user(IN p_uid INT8, IN p_cooldown INT, IN p_daily_max INT)
     -- 打劫用户
     -- p_uid: 打劫人 ID
     -- p_cooldown: 冷却时间 (秒)
@@ -56,7 +56,7 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS shubot_rob_get_user_pts;
-CREATE PROCEDURE shubot_rob_get_user_pts(IN p_uid INT, OUT pts INT)
+CREATE PROCEDURE shubot_rob_get_user_pts(IN p_uid INT8, OUT pts INT)
     -- 获取用户的积分
     -- p_uid: 用户ID
 BEGIN
@@ -78,7 +78,7 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS shubot_rob_transfer;
-CREATE PROCEDURE shubot_rob_transfer(IN p_victim_uid INT, IN p_robber_uid INT, IN p_rob_ratio FLOAT)
+CREATE PROCEDURE shubot_rob_transfer(IN p_victim_uid INT8, IN p_robber_uid INT8, IN p_rob_ratio FLOAT)
     -- 打劫用户
     -- p_victim_uid: 被盗用户
     -- p_robber_uid: 抢劫用户
@@ -127,7 +127,7 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS shubot_rob_reset_user;
-CREATE PROCEDURE shubot_rob_reset_user(IN p_victim_uid INT)
+CREATE PROCEDURE shubot_rob_reset_user(IN p_victim_uid INT8)
     -- 打劫用户
     -- p_victim_uid: 被盗用户
     -- p_robber_uid: 抢劫用户

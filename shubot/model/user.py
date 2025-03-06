@@ -62,4 +62,4 @@ class UserModel:
         """,
             (user_id,),
         )
-        return CultivationRecord(user_id, *data)
+        return CultivationRecord(user_id, *(data or []))
