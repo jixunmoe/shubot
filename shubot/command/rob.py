@@ -11,7 +11,6 @@ import aiomysql
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from telegram.ext import Application, CommandHandler, ContextTypes, CallbackQueryHandler
 from telegram.ext.filters import ChatType
-from telegram.helpers import escape_markdown
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
@@ -180,6 +179,7 @@ class RobCommand(BotCommandHandlerMixin):
             loser_user = await context.bot.get_chat(loser_id)
             return await query.answer(f"🚫 只有 {loser_user.full_name} 可以操作！", show_alert=True)
 
+        await query.answer()
         match action:
             case "pay":
                 await self._handle_rob_action_pay(winner_id, loser_id, update, context)

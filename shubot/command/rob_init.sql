@@ -31,7 +31,7 @@ BEGIN
             (user_id, count, last_rob)
         VALUES (p_uid, 1, NOW());
         SELECT 1, 1;
-    ELSEIF DATE(rob_date) != CURRENT_DATE THEN
+    ELSEIF DATE(rob_date) != UTC_DATE THEN
         -- 今日未打劫，成功。
         UPDATE rob_records
         SET count    = 1,
