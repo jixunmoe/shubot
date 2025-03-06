@@ -19,6 +19,11 @@ class CultivationRecord:
     next_cost: int = field(default=10)
     """下次突破所需积分"""
 
+    @property
+    def major_stage(self) -> int:
+        """主境界"""
+        return self.stage // 3
+
 
 class UserModel:
     _db: "DatabaseManager"

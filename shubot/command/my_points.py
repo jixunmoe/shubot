@@ -8,12 +8,13 @@ from telegram.ext.filters import ChatType
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
+from shubot.ext.command import BotCommandHandlerMixin
 from shubot.util import reply, defer_delete
 
 logger = logging.getLogger(__name__)
 
 
-class MyStatsCommand:
+class MyStatsCommand(BotCommandHandlerMixin):
     """查询当前用户状态"""
 
     _app: Application

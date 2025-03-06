@@ -10,6 +10,10 @@ class IntRange:
     min: int
     max: int
 
+    def to_tuple(self) -> tuple[int, int]:
+        """转换为 tuple 方便使用"""
+        return self.min, self.max
+
 
 @dataclass
 class FloatRange:
@@ -19,6 +23,10 @@ class FloatRange:
 
     min: float
     max: float
+
+    def to_tuple(self) -> tuple[float, float]:
+        """转换为 tuple 方便使用"""
+        return self.min, self.max
 
 
 @dataclass
@@ -77,9 +85,35 @@ class SlaveRulesConfig:
 
 
 @dataclass
+class RobMessages:
+    """打劫模块消息配置"""
+
+    too_weak: str
+    """打劫对象太弱的消息"""
+    too_strong: str
+    """打劫对象太强的消息"""
+    escapes: list[str]
+    """逃跑成功的消息"""
+    tie: str
+    """平局的消息"""
+    rob_action_descriptions: list[str]
+    """被打劫时的描述"""
+    steal_complete: list[str]
+    """打劫完成的消息"""
+    steal_empty: list[str]
+    """打劫对象没钱时显示的消息"""
+    fight_win: list[str]
+    """反抗成功的消息"""
+    fight_lose: list[str]
+    """反抗失败的消息"""
+
+
+@dataclass
 class RobConfig:
     """打劫模块配置"""
 
+    messages: RobMessages
+    """打劫消息配置"""
     daily_limit: int = field(default=5)
     """每日打劫次数限制"""
     escape_chance: float = field(default=0.2)
@@ -183,9 +217,7 @@ class Config:
     random_events: list[RandomEventConfig] = field(default_factory=list)
     cultivation: list[str] = field(default_factory=list)
     """头衔列表"""
-    major_breakthroughs: list[BreakThroughConfig] = field(
-        default_factory=_default_major_breakthroughs
-    )
+    major_breakthroughs: list[BreakThroughConfig] = field(default_factory=_default_major_breakthroughs)
     """大突破配置"""
     lottery: LotteryConfig = field(default_factory=LotteryConfig)
     """刮刮乐(乐透)配置"""

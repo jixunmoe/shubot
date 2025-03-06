@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from telegram import Bot, BotCommandScopeAllPrivateChats, BotCommand
@@ -5,9 +6,11 @@ from telegram.ext import Application, JobQueue
 
 from shubot.command.checkin import CheckinCommand
 from shubot.command.my_points import MyStatsCommand
+from shubot.command.rob import RobCommand
 from shubot.command.slave import SlaveCommand
 from shubot.config import Config
 from shubot.database import DatabaseManager
+from shubot.ext.command import BotCommandHandlerMixin
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +25,7 @@ class ShuBot:
 
     _config: Config
     _app: Application
-    _slave: SlaveCommand
-    _checkin: CheckinCommand
+    _command_handlers: list[BotCommandHandlerMixin] = []
 
     def __init__(self, config: Config):
         # Setup singleton
@@ -37,14 +39,18 @@ class ShuBot:
         builder.post_init(self._on_post_init)
         self._app = builder.build()
 
-        self._slave = SlaveCommand(self._app, config.slave_rules)
-        self._checkin = CheckinCommand(self._app, config)
-        self._my_stats = MyStatsCommand(self._app, config)
+        self._command_handlers.append(SlaveCommand(self._app, config.slave_rules))
+        self._command_handlers.append(CheckinCommand(self._app, config))
+        self._command_handlers.append(MyStatsCommand(self._app, config))
+        self._command_handlers.append(RobCommand(self._app, config))
 
     async def _on_post_init(self, app: Application):
         logger.info("init db...")
         await DatabaseManager.get_instance().init_pool(self._config.db)
+        logger.info("init command db...")
+        await asyncio.gather(*(handler.init_db() for handler in self._command_handlers))
 
+        logger.info("init bot startup...")
         await self._set_commands()
         await self._check_bot_username()
         logger.info("post init done")

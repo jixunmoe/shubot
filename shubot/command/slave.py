@@ -16,6 +16,7 @@ from telegram.helpers import escape_markdown
 
 from shubot.config import SlaveRulesConfig
 from shubot.database import DatabaseManager
+from shubot.ext.command import BotCommandHandlerMixin
 from shubot.util import defer_delete, reply
 
 
@@ -30,7 +31,7 @@ async def _celebrate(ctx: ContextTypes.DEFAULT_TYPE):
     await payload.chat.send_message(text=payload.text, parse_mode="MarkdownV2")
 
 
-class SlaveCommand:
+class SlaveCommand(BotCommandHandlerMixin):
     _app: Application
     _config: SlaveRulesConfig
     _db: DatabaseManager

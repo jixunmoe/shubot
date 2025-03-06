@@ -8,12 +8,13 @@ from telegram.ext.filters import ChatType
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
+from shubot.ext.command import BotCommandHandlerMixin
 from shubot.util import reply, defer_delete
 
 CHECKIN_STAR_PATTERN = "⭐" * 5 + "✨" * 5
 
 
-class CheckinCommand:
+class CheckinCommand(BotCommandHandlerMixin):
     _app: Application
     _config: Config
     _db: DatabaseManager
