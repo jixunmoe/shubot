@@ -1,10 +1,7 @@
 import asyncio
-import json
-from base64 import b64encode, b64decode
-from dataclasses import is_dataclass, asdict
 from datetime import datetime, UTC
 from random import SystemRandom
-from typing import cast, Any
+from typing import cast
 
 from telegram import Message, Bot
 from telegram.ext import Application, CallbackContext
@@ -47,13 +44,14 @@ class BotCommandHandlerMixin:
         self,
         source: Message,
         reply: str,
+        reply_markup=None,
         parse_mode=None,
         delete_source=True,
         del_source_timeout: int = 10,
         delete_reply=True,
         del_reply_timeout: int = 10,
     ):
-        reply_message = await source.reply_text(reply, parse_mode=parse_mode)
+        reply_message = await source.reply_text(reply, reply_markup=reply_markup, parse_mode=parse_mode)
         if delete_source:
             self.delete(source, del_source_timeout)
         if delete_reply:

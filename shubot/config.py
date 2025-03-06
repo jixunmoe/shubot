@@ -183,8 +183,28 @@ def _default_lottery_prizes() -> list[LotteryPrize]:
 
 
 @dataclass
+class LotteryMessages:
+    """刮刮乐(乐透)消息配置"""
+
+    game: str
+    """游戏开始消息"""
+    btn_cost: str
+    """抽奖按钮的显示文本模板"""
+    owner_mismatch: str
+    """拒绝不是本人的点击事件"""
+    finish: str
+    """抽奖结束消息"""
+    insufficient_funds: str
+    """余额不足"""
+    daily_limit_exceeded: str
+    """超过每日抽奖次数限制"""
+
+
+@dataclass
 class LotteryConfig:
     """刮刮乐(乐透)配置"""
+
+    messages: LotteryMessages
 
     chance: float = field(default=0.1)
     """中奖概率"""
