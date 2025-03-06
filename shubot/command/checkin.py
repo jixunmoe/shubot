@@ -2,7 +2,7 @@ import random
 from datetime import datetime, UTC
 from textwrap import dedent
 
-from telegram import Update
+from telegram import Update, User
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram.ext.filters import ChatType
 
@@ -35,7 +35,7 @@ class CheckinCommand(BotCommandHandlerMixin):
             return await message.reply_text("🌱 请在群组内签到哦~")
 
         earned = random.randint(1, 10)
-        checkin_ok = await self._set_checkin(user.id, earned, datetime.now(UTC).date())
+        checkin_ok = await self._set_checkin(user, earned, datetime.now(UTC).date())
         if checkin_ok:
             reply_text = dedent(
                 f"""\
@@ -55,24 +55,17 @@ class CheckinCommand(BotCommandHandlerMixin):
         reply_msg = await reply(message, reply_text)
         defer_delete(context.job_queue, reply_msg, 10)
 
-    async def _set_checkin(self, user_id: int, points: int, date: datetime.date) -> bool:
-        # Create user if not exists
+    async def _set_checkin(self, user: User, points: int, date: datetime.date) -> bool:
+        await self._db.User.ensure_exists(user)
+
         updated = await self._db.update(
             """
-            INSERT IGNORE INTO users (user_id, points, last_checkin)
-            VALUES (%s, %s, %s)
-        """,
-            (user_id, points, date),
-        )
-
-        if not updated:
-            # User exists, update points
-            updated = await self._db.update(
-                """
                 UPDATE users
-                SET points = points + %s AND last_checkin = %s
-                WHERE user_id = %s AND last_checkin != %s
+                SET points       = points + %s,
+                    last_checkin = UTC_DATE()
+                WHERE user_id = %s
+                  AND (last_checkin IS NULL OR last_checkin != UTC_DATE());
             """,
-                (points, date, user_id, date),
-            )
+            (points, user.id),
+        )
         return updated > 0
