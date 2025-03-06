@@ -70,7 +70,7 @@ rob:
       - "🏆 胜负已分！{loser} 面临 {winner} 的威胁"
       - "💥 {loser} 被彻底压制！请选择求饶方式："
     steal_complete:
-      - "💰 {loser} 的储物袋破了个洞，掉出 {rob_amount} 灵石！",
+      - "💰 {loser} 的储物袋破了个洞，掉出 {rob_amount} 灵石！"
       - "⚔️ 寒光一闪，{loser} 被迫交出 {rob_amount} 灵石！"
     steal_empty:
       - "🔍 {loser} 身上一无所有，{robber} 只好失望而归"
