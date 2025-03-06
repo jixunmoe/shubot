@@ -54,15 +54,12 @@ class UserModel:
 
     async def get_cultivation_data(self, user_id: int) -> CultivationRecord:
         """获取用户的修仙数据"""
-        data = (
-            await self._db.find_one(
-                """
+        data = await self._db.find_one(
+            """
             SELECT stage, pills, next_cost
             FROM user_cultivation
             WHERE user_id = %s
         """,
-                (user_id,),
-            )
-            or {}
+            (user_id,),
         )
-        return CultivationRecord(user_id, **data)
+        return CultivationRecord(user_id, *data)
