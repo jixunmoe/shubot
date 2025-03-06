@@ -36,8 +36,6 @@ class MyStatsCommand:
         user = update.effective_user
         message = update.message
 
-        # await self._db.User.ensure_exists(user)
-
         try:
             [points, cult] = await asyncio.gather(
                 self._db.User.get_points(user.id),
