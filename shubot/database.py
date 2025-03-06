@@ -7,6 +7,7 @@ from typing import AsyncIterator, Optional, Any
 import aiomysql
 
 from shubot.config import DatabaseConfig
+from shubot.model.user import UserModel
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,11 @@ class DatabaseManager:
 
     _pool: None | aiomysql.Pool
 
+    User: UserModel
+
     def __init__(self):
         self._pool = None
+        self.User = UserModel(self)
 
     async def init_pool(self, config: DatabaseConfig):
         self._pool = await aiomysql.create_pool(

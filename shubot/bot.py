@@ -4,6 +4,7 @@ from telegram import Bot, BotCommandScopeAllPrivateChats, BotCommand
 from telegram.ext import Application, JobQueue
 
 from shubot.command.checkin import CheckinCommand
+from shubot.command.my_points import MyStatsCommand
 from shubot.command.slave import SlaveCommand
 from shubot.config import Config
 from shubot.database import DatabaseManager
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class ShuBot:
-    _instance: 'ShuBot' = None
+    _instance: "ShuBot" = None
 
     @staticmethod
     def get_instance():
@@ -38,6 +39,7 @@ class ShuBot:
 
         self._slave = SlaveCommand(self._app, config.slave_rules)
         self._checkin = CheckinCommand(self._app, config)
+        self._my_stats = MyStatsCommand(self._app, config)
 
     async def _on_post_init(self, app: Application):
         logger.info("init db...")
@@ -59,15 +61,16 @@ class ShuBot:
         return self._app.job_queue
 
     async def _set_commands(self):
-        await self.get_bot().set_my_commands(commands=[
-            BotCommand("addgroup", "管理员添加授权群组（需要群组ID）"),
-            BotCommand("removegroup", "管理员移除授权群组（需要群组ID）"),
-            BotCommand("my", "查看我的积分"),
-            BotCommand("checkin", "每日签到获取积分"),
-            BotCommand("add", "管理员增加积分（回复消息使用）"),
-            BotCommand("del", "管理员扣除积分（回复消息使用）")
-        ],
-            scope=BotCommandScopeAllPrivateChats()
+        await self.get_bot().set_my_commands(
+            commands=[
+                BotCommand("addgroup", "管理员添加授权群组（需要群组ID）"),
+                BotCommand("removegroup", "管理员移除授权群组（需要群组ID）"),
+                BotCommand("my", "查看我的积分"),
+                BotCommand("checkin", "每日签到获取积分"),
+                BotCommand("add", "管理员增加积分（回复消息使用）"),
+                BotCommand("del", "管理员扣除积分（回复消息使用）"),
+            ],
+            scope=BotCommandScopeAllPrivateChats(),
         )
 
     async def _check_bot_username(self):
@@ -75,7 +78,9 @@ class ShuBot:
         try:
             me = await bot.get_me()
             if me.username != self._config.telegram.username:
-                raise RuntimeError(f"机器人用户名配置错误！当前：{me.username}，应为：{self._config.telegram.username}")
+                raise RuntimeError(
+                    f"机器人用户名配置错误！当前：{me.username}，应为：{self._config.telegram.username}"
+                )
         except Exception as e:
             logger.critical(f"机器人初始化失败: {str(e)}")
             exit(1)
