@@ -19,16 +19,12 @@ class CheckinCommand(BotCommandHandlerMixin):
     _config: Config
     _db: DatabaseManager
 
-    def __init__(
-        self, app: Application, config: Config, db: DatabaseManager | None = None
-    ):
+    def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
         self._db = db or DatabaseManager.get_instance()
         self._app = app
         self._config = config
 
-        self._app.add_handler(
-            CommandHandler("checkin", self._handle_checkin, filters=ChatType.GROUPS)
-        )
+        self._app.add_handler(CommandHandler("checkin", self._handle_checkin, filters=ChatType.GROUPS))
 
     async def _handle_checkin(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """每日签到"""
@@ -59,9 +55,7 @@ class CheckinCommand(BotCommandHandlerMixin):
         reply_msg = await reply(message, reply_text)
         defer_delete(context.job_queue, reply_msg, 10)
 
-    async def _set_checkin(
-        self, user_id: int, points: int, date: datetime.date
-    ) -> bool:
+    async def _set_checkin(self, user_id: int, points: int, date: datetime.date) -> bool:
         # Create user if not exists
         updated = await self._db.update(
             """

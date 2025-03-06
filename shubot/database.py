@@ -1,7 +1,5 @@
 import logging
-import random
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
 from typing import AsyncIterator, Any
 
 import aiomysql

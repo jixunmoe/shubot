@@ -46,25 +46,17 @@ class SlaveCommand(BotCommandHandlerMixin):
         self._app = app
         self._config = config
 
+        self._app.add_handler(CommandHandler("nuli", self._handle_assign_slave, filters=ChatType.GROUPS))
         self._app.add_handler(
-            CommandHandler("nuli", self._handle_assign_slave, filters=ChatType.GROUPS)
-        )
-        self._app.add_handler(
-            MessageHandler(
-                filters.TEXT & ~filters.COMMAND, self._handle_confirm_slavery
-            ),
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self._handle_confirm_slavery),
             group=1,
         )
         self._app.add_handler(
-            MessageHandler(
-                filters.ALL & ~filters.COMMAND, self._handle_enforce_slavery
-            ),
+            MessageHandler(filters.ALL & ~filters.COMMAND, self._handle_enforce_slavery),
             group=2,
         )
 
-    async def _handle_assign_slave(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE
-    ):
+    async def _handle_assign_slave(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """帮主任命奴隶"""
         message = update.message
         master_user = message.from_user
@@ -85,9 +77,7 @@ class SlaveCommand(BotCommandHandlerMixin):
         if slave_user.is_bot or slave_user.id == master_user.id:
             return await reply(message, "🌀 帮主大人，这是孝敬给您的奴隶，比较野")
 
-        await self._insert_slave_relation(
-            master_user.id, slave_user.id, group_id, today
-        )
+        await self._insert_slave_relation(master_user.id, slave_user.id, group_id, today)
 
         # 契约
         text = dedent(
@@ -108,22 +98,16 @@ class SlaveCommand(BotCommandHandlerMixin):
 
         # 删除契约消息
         context.job_queue.run_once(
-            lambda ctx: ctx.bot.delete_message(
-                chat_id=sent_msg.chat_id, message_id=sent_msg.message_id
-            ),
+            lambda ctx: ctx.bot.delete_message(chat_id=sent_msg.chat_id, message_id=sent_msg.message_id),
             30,
         )
 
-    async def _handle_confirm_slavery(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE
-    ):
+    async def _handle_confirm_slavery(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = update.message
         if message.text != self._config.init_phrase:
             return
 
-        await self._update_confirm_slavery(
-            message.from_user.id, datetime.utcnow().date(), True
-        )
+        await self._update_confirm_slavery(message.from_user.id, datetime.utcnow().date(), True)
 
         text = dedent(
             f"""\
@@ -142,21 +126,15 @@ class SlaveCommand(BotCommandHandlerMixin):
                 f"🍃 清风为凭，明月为证，此契天地共鉴！",
             ]
         ):
-            context.job_queue.run_once(
-                _celebrate, data=CelebrateJobData(message.chat, text), when=i + 1
-            )
+            context.job_queue.run_once(_celebrate, data=CelebrateJobData(message.chat, text), when=i + 1)
 
-    async def _handle_enforce_slavery(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE
-    ):
+    async def _handle_enforce_slavery(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = update.message
         user = message.from_user
         if message.chat.type == "private" or user.is_bot:
             return
 
-        record = await self._find_slave_by_date(
-            user.id, message.chat.id, datetime.utcnow().date()
-        )
+        record = await self._find_slave_by_date(user.id, message.chat.id, datetime.utcnow().date())
         if not record:
             return
 
@@ -203,9 +181,7 @@ class SlaveCommand(BotCommandHandlerMixin):
             (group_id,),
         )
 
-    async def _insert_slave_relation(
-        self, master_id: int, slave_id: int, group_id: int, date: datetime.date
-    ):
+    async def _insert_slave_relation(self, master_id: int, slave_id: int, group_id: int, date: datetime.date):
         return await self._db.update(
             """
             INSERT INTO slave_records 
@@ -215,9 +191,7 @@ class SlaveCommand(BotCommandHandlerMixin):
             (master_id, slave_id, group_id, date),
         )
 
-    async def _update_confirm_slavery(
-        self, slave_id: int, date: datetime.date, confirm: bool
-    ):
+    async def _update_confirm_slavery(self, slave_id: int, date: datetime.date, confirm: bool):
         await self._db.update(
             """
             UPDATE slave_records SET confirmed = TRUE 
@@ -226,9 +200,7 @@ class SlaveCommand(BotCommandHandlerMixin):
             (int(confirm), slave_id, date),
         )
 
-    async def _find_slave_by_date(
-        self, slave_id: int, group_id: int, date: datetime.date
-    ):
+    async def _find_slave_by_date(self, slave_id: int, group_id: int, date: datetime.date):
         return await self._db.find_one(
             """
             SELECT master_id, confirmed 

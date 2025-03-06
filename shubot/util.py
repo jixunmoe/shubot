@@ -29,6 +29,7 @@ async def reply(src: Message, text: str, parse_mode=None, delete_prev_msg=True, 
     if delete_prev_msg:
         if defer_delete_by:
             from shubot.bot import ShuBot
+
             defer_delete(ShuBot.get_instance().get_job_queue(), src, timeout=defer_delete_by)
         else:
             await src.delete()

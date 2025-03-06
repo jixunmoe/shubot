@@ -6,9 +6,7 @@ from mashumaro.codecs.yaml import yaml_decode
 from shubot.bot import ShuBot
 from shubot.config import Config
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 
 def start_bot(config_path: str):
@@ -22,9 +20,7 @@ def start_bot(config_path: str):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", help="config file path", default="config.yaml"
-    )
+    parser.add_argument("-c", "--config", help="config file path", default="config.yaml")
     args = parser.parse_args()
     start_bot(config_path=args.config)
 

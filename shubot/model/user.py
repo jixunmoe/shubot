@@ -49,9 +49,7 @@ class UserModel:
 
     async def get_points(self, user_id: int) -> int:
         """获取用户的积分"""
-        result = await self._db.find_one(
-            """SELECT points FROM users WHERE user_id = %s""", (user_id,)
-        )
+        result = await self._db.find_one("""SELECT points FROM users WHERE user_id = %s""", (user_id,))
         return result[0] if result else 0
 
     async def get_cultivation_data(self, user_id: int) -> CultivationRecord:

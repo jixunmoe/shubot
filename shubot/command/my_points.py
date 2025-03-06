@@ -21,16 +21,12 @@ class MyStatsCommand(BotCommandHandlerMixin):
     _config: Config
     _db: DatabaseManager
 
-    def __init__(
-        self, app: Application, config: Config, db: DatabaseManager | None = None
-    ):
+    def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
         self._db = db or DatabaseManager.get_instance()
         self._app = app
         self._config = config
 
-        self._app.add_handler(
-            CommandHandler("my", self._handle_my, filters=ChatType.GROUPS)
-        )
+        self._app.add_handler(CommandHandler("my", self._handle_my, filters=ChatType.GROUPS))
 
     async def _handle_my(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """响应 /my 命令，查询当前用户的状态"""

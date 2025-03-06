@@ -84,9 +84,7 @@ class ShuBot:
         try:
             me = await bot.get_me()
             if me.username != self._config.telegram.username:
-                raise RuntimeError(
-                    f"机器人用户名配置错误！当前：{me.username}，应为：{self._config.telegram.username}"
-                )
+                raise RuntimeError(f"机器人用户名配置错误！当前：{me.username}，应为：{self._config.telegram.username}")
         except Exception as e:
             logger.critical(f"机器人初始化失败: {str(e)}")
             exit(1)
