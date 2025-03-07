@@ -37,7 +37,7 @@ class TelegramBotConfig:
 
     token: str
     username: str
-    admin_ids: list[str]
+    admin_ids: list[int]
 
 
 @dataclass
@@ -243,6 +243,13 @@ class LeaderboardConfig:
 
 
 @dataclass
+class MiscMessages:
+    """杂项消息配置"""
+
+    user_pts_updated: str = field(default=r"✅ 积分更新: {user}\n🔢 积分更变: `{old}` → `{new}` \(delta\)")
+
+
+@dataclass
 class Config:
     """总配置文件对象"""
 
@@ -269,3 +276,5 @@ class Config:
     """排行榜配置"""
     region_names: dict[str, str] = field(default_factory=dict)
     """意义不明的区域 id 到名称的映射"""
+    misc_messages: MiscMessages = field(default_factory=MiscMessages)
+    """杂项消息配置"""

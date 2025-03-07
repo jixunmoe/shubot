@@ -1,6 +1,7 @@
 import asyncio
 import logging
-from functools import lru_cache
+from functools import lru_cache, partial
+from math import copysign
 from textwrap import dedent
 from traceback import format_exception
 
@@ -12,7 +13,6 @@ from telegram.helpers import escape_markdown
 from shubot.config import Config
 from shubot.database import DatabaseManager
 from shubot.ext.command import BotCommandHandlerMixin
-from shubot.util import reply, defer_delete
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +35,12 @@ class UserInfoCommand(BotCommandHandlerMixin):
         self._app.add_handler(
             CommandHandler(["paihang", "leaderboard", "ranking"], self._handle_ranking, filters=ChatType.GROUPS)
         )
+        self._app.add_handler(
+            CommandHandler("add", partial(self._handle_modify_points, sign=1), filters=ChatType.GROUPS)
+        )
+        self._app.add_handler(
+            CommandHandler("del", partial(self._handle_modify_points, sign=-1), filters=ChatType.GROUPS)
+        )
 
     async def _handle_my(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """响应 /my 命令，查询当前用户的状态"""
@@ -49,7 +55,7 @@ class UserInfoCommand(BotCommandHandlerMixin):
             logger.info(f"修仙数据查询结果：{cult}")
             stage_name = self._config.cultivation[cult.stage]
 
-            sent_msg = await reply(
+            sent_msg = await self.reply(
                 message,
                 dedent(
                     f"""\
@@ -63,7 +69,6 @@ class UserInfoCommand(BotCommandHandlerMixin):
                    """
                 ),
             )
-            defer_delete(context.job_queue, sent_msg, timeout=10)
 
         except Exception as e:
             logger.error(f"查询积分失败：{str(e)} - {format_exception(e)}")
@@ -118,3 +123,32 @@ class UserInfoCommand(BotCommandHandlerMixin):
             """,
             (group_id,),
         )
+
+    async def _handle_modify_points(self, update: Update, context: ContextTypes.DEFAULT_TYPE, /, sign: int):
+        """响应 /add 和 /del 命令，修改用户积分"""
+        message = update.message
+        if update.effective_user.id not in self._config.telegram.admin_ids:
+            return await message.reply_text(
+                rf"⚠️ 权限不足 \(uid\=`{update.effective_user.id}`\)", parse_mode="MarkdownV2"
+            )
+        if not message.reply_to_message or message.chat.type == "private":
+            await message.reply_text("⚠️ 请通过回复群成员消息使用此命令")
+            return
+        user = message.reply_to_message.from_user
+        if user.is_bot:
+            return await message.reply_text("⚠️ 不能操作机器人")
+
+        if not context.args or not context.args[0].isdigit():
+            return await self.reply(
+                update.message, "⚠️ 用法：`/add <正整数>`\n示例：`/add 50`（`/del` 指令同理）", parse_mode="MarkdownV2"
+            )
+
+        delta = int(copysign(int(context.args[0]), sign))
+        old_pts, new_pts = await self._db.User.modify_points(update.effective_user.id, delta)
+        reply = self._config.misc_messages.user_pts_updated.format(
+            user=escape_markdown(user.full_name, version=2),
+            delta=escape_markdown(f"{delta:+}", version=2),
+            old=old_pts,
+            new=new_pts,
+        )
+        await self.reply(message, reply, parse_mode="MarkdownV2")

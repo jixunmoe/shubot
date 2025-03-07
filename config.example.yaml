@@ -217,3 +217,9 @@ region_names:
   jp: 日本
   sg: 新加坡
   us: 美国
+
+misc_messages:
+  user_pts_updated: |-
+    ✅ 操作成功
+    目标用户: {user}
+    积分更变: `{old}` → `{new}` \({delta}\)

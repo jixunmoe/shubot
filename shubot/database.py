@@ -35,6 +35,7 @@ class DatabaseManager:
             db=config.db,
             autocommit=False,
         )
+        await self.User.init()
 
     @asynccontextmanager
     async def get_cursor(self) -> AsyncIterator[aiomysql.Cursor]:
@@ -66,6 +67,14 @@ class DatabaseManager:
                 row_count = cursor.rowcount
                 await conn.commit()
                 return row_count
+
+    async def call(self, procedure: str, *args: Any) -> tuple[int, tuple[Any, ...]]:
+        """调用存储过程，返回受影响行数和结果"""
+        args_tpl = ",".join(["%s"] * len(args))
+        query = f"CALL {procedure}({args_tpl})"
+        async with self.get_cursor() as cursor:
+            await cursor.execute(query, args)
+            return cursor.rowcount, await cursor.fetchone()
 
 
 DatabaseManager._instance = DatabaseManager()
