@@ -223,3 +223,7 @@ misc_messages:
     ✅ 操作成功
     目标用户: {user}
     积分更变: `{old}` → `{new}` \({delta}\)
+  welcome_member: |-
+    🎉 欢迎 [{name}](tg://user?id={id}) 加入本群！
+    📚 群规请查看\>置顶消息第一条
+    💬 畅聊时请注意遵守群规哦\~

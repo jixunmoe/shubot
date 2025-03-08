@@ -247,6 +247,7 @@ class MiscMessages:
     """杂项消息配置"""
 
     user_pts_updated: str = field(default=r"✅ 积分更新: {user}\n🔢 积分更变: `{old}` → `{new}` \(delta\)")
+    welcome_member: str = field(default=r"🎉 欢迎 [{name}](tg://user?id={id}) 加入本群！")
 
 
 @dataclass
