@@ -71,7 +71,7 @@ class SlaveCommand(BotCommandHandlerMixin):
             return await reply(message, "⚡ 请通过回复目标修士的消息使用此令")
 
         gang_leader = await self._find_gang_leader(group_id)
-        if gang_leader["user_id"] != master_user.id:
+        if gang_leader != master_user.id:
             return await reply(message, "❌ 此乃帮主秘法，尔等岂可妄用！")
 
         slave_user = message.reply_to_message.from_user
@@ -170,8 +170,8 @@ class SlaveCommand(BotCommandHandlerMixin):
         )
         return bool(found)
 
-    async def _find_gang_leader(self, group_id: int) -> Optional[dict]:
-        return await self._db.find_one(
+    async def _find_gang_leader(self, group_id: int) -> Optional[int]:
+        result = await self._db.find_one(
             """
             SELECT u.user_id, uc.stage, u.points 
             FROM user_group ug
@@ -183,6 +183,7 @@ class SlaveCommand(BotCommandHandlerMixin):
         """,
             (group_id,),
         )
+        return result[0] if result else None
 
     async def _insert_slave_relation(self, master_id: int, slave_id: int, group_id: int, date: datetime.date):
         return await self._db.update(
