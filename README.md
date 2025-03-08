@@ -48,10 +48,37 @@ shubot 重构计划。
 - `users.last_checkin` 列不存在。
 
 ```sql
-ALTER TABLE shubot.users ADD last_checkin DATE NULL;
+ALTER TABLE shubot.users
+    ADD last_checkin DATE NULL;
 ```
 
 ## TODO
 
 - [ ] 使用 migration 框架处理数据库版本升级
 - [ ] 安装 Webhook 处理事件而非 polling 服务器获取更好性能
+
+### 重构进度
+
+- [ ] 书库
+- [ ] 通用消息处理
+    - [ ] 「书库」信息
+    - [ ] 记录群组和用户关联
+    - [ ] 随机事件（奇遇）处理
+    - [ ] 文件上传处理（电子书）
+- [ ] 指令
+    - [ ] 排行榜指令
+    - [ ] 新人欢迎事件
+    - [ ] 兑换指令
+        - [ ] 指令处理
+        - [ ] 按钮事件回调
+    - [x] 刮刮乐指令
+    - [x] 打劫指令
+    - [ ] 突破指令
+    - [x] 每日签到指令
+    - [x] 查询当前帐号信息指令
+    - [ ] 一键猫娘指令
+        - [x] 基本交互实现
+        - [ ] 测试正常运作
+- [ ] 管理指令
+    - [x] 增加/减少积分数量
+    - [ ] 添加/删除授权群组
