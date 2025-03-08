@@ -5,6 +5,7 @@ from telegram import Bot, BotCommandScopeAllPrivateChats, BotCommand
 from telegram.ext import Application, JobQueue
 
 from shubot.command.checkin import CheckinCommand
+from shubot.command.group_auth import GroupAuthCommand
 from shubot.command.lottery import LotteryCommand
 from shubot.command.user_info import UserInfoCommand
 from shubot.command.rob import RobCommand
@@ -40,11 +41,13 @@ class ShuBot:
         builder.post_init(self._on_post_init)
         self._app = builder.build()
 
-        self._command_handlers.append(SlaveCommand(self._app, config.slave_rules))
+        self._command_handlers.append(SlaveCommand(self._app, config))
         self._command_handlers.append(CheckinCommand(self._app, config))
         self._command_handlers.append(UserInfoCommand(self._app, config))
         self._command_handlers.append(RobCommand(self._app, config))
         self._command_handlers.append(LotteryCommand(self._app, config))
+
+        self._command_handlers.append(GroupAuthCommand(self._app, config))
 
     async def _on_post_init(self, app: Application):
         logger.info("init db...")

@@ -3,8 +3,10 @@ from datetime import datetime, UTC
 from random import SystemRandom
 from typing import cast
 
-from telegram import Message, Bot
+from telegram import Message, Bot, User
 from telegram.ext import Application, CallbackContext
+
+from shubot.config import Config
 
 
 async def _delete_message(ctx: CallbackContext):
@@ -14,12 +16,17 @@ async def _delete_message(ctx: CallbackContext):
 
 class BotCommandHandlerMixin:
     _app: Application
+    _config: Config
     _rnd = SystemRandom()
 
     @property
     def bot(self) -> Bot:
         # noinspection PyUnresolvedReferences
         return self._app.bot
+
+    def is_admin(self, user: User | int) -> bool:
+        user_id = cast(int, user.id if isinstance(user, User) else user)
+        return user_id in self._config.telegram.admin_ids
 
     def chance_hit(self, chance: float) -> bool:
         """根据概率判断是否命中。chance 为 0 到 1 之间的浮点数"""

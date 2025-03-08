@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, Any
@@ -5,6 +6,7 @@ from typing import AsyncIterator, Any
 import aiomysql
 
 from shubot.config import DatabaseConfig
+from shubot.model.group_auth import GroupAuthModel
 from shubot.model.user import UserModel
 
 logger = logging.getLogger(__name__)
@@ -21,10 +23,12 @@ class DatabaseManager:
     _pool: None | aiomysql.Pool
 
     User: UserModel
+    GroupAuth: GroupAuthModel
 
     def __init__(self):
         self._pool = None
         self.User = UserModel(self)
+        self.GroupAuth = GroupAuthModel(self)
 
     async def init_pool(self, config: DatabaseConfig):
         self._pool = await aiomysql.create_pool(
@@ -35,7 +39,10 @@ class DatabaseManager:
             db=config.db,
             autocommit=False,
         )
-        await self.User.init()
+        await asyncio.gather(
+            self.User.init(),
+            self.GroupAuth.init(),
+        )
 
     @asynccontextmanager
     async def get_cursor(self) -> AsyncIterator[aiomysql.Cursor]:

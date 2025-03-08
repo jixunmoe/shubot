@@ -14,7 +14,7 @@ from telegram.ext import (
 from telegram.ext.filters import ChatType
 from telegram.helpers import escape_markdown
 
-from shubot.config import SlaveRulesConfig
+from shubot.config import Config
 from shubot.database import DatabaseManager
 from shubot.ext.command import BotCommandHandlerMixin
 from shubot.util import defer_delete, reply
@@ -33,13 +33,13 @@ async def _celebrate(ctx: ContextTypes.DEFAULT_TYPE):
 
 class SlaveCommand(BotCommandHandlerMixin):
     _app: Application
-    _config: SlaveRulesConfig
+    _config: Config
     _db: DatabaseManager
 
     def __init__(
         self,
         app: Application,
-        config: SlaveRulesConfig,
+        config: Config,
         db: DatabaseManager | None = None,
     ):
         self._db = db or DatabaseManager.get_instance()
@@ -58,6 +58,7 @@ class SlaveCommand(BotCommandHandlerMixin):
 
     async def _handle_assign_slave(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """帮主任命奴隶"""
+        config = self._config.slave_rules
         message = update.message
         master_user = message.from_user
         group_id = message.chat.id
@@ -90,7 +91,7 @@ class SlaveCommand(BotCommandHandlerMixin):
             💢 帮主冷喝一声：『孽畜，还不速速立下跪下！』
             💢  {self._escape(slave_user.full_name)} 一哆嗦，马上跪下来！
             📜 请道友 {self._escape(slave_user.full_name)} 诵念：
-            『{self._escape(self._config.init_phrase)}』（必须一字不差的打完）
+            『{self._escape(config.init_phrase)}』（必须一字不差的打完）
         """
         )
 
@@ -103,11 +104,12 @@ class SlaveCommand(BotCommandHandlerMixin):
         )
 
     async def _handle_confirm_slavery(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        config = self._config.slave_rules
         message = update.message
-        if message.text != self._config.init_phrase:
+        if message.text != config.init_phrase:
             return
 
-        await self._update_confirm_slavery(message.from_user.id, datetime.utcnow().date(), True)
+        await self._update_confirm_slavery(message.from_user.id, datetime.now(UTC).date(), True)
 
         text = dedent(
             f"""\
@@ -129,27 +131,28 @@ class SlaveCommand(BotCommandHandlerMixin):
             context.job_queue.run_once(_celebrate, data=CelebrateJobData(message.chat, text), when=i + 1)
 
     async def _handle_enforce_slavery(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        config = self._config.slave_rules
         message = update.message
         user = message.from_user
         if message.chat.type == "private" or user.is_bot:
             return
 
-        record = await self._find_slave_by_date(user.id, message.chat.id, datetime.utcnow().date())
+        record = await self._find_slave_by_date(user.id, message.chat.id, datetime.now(UTC).date())
         if not record:
             return
 
         master_id, confirmed = record
-        if not confirmed and message.text != self._config.init_phrase:
+        if not confirmed and message.text != config.init_phrase:
             # 契约未确认，要求诵读咒语
-            if message.text != self._config.init_phrase:
-                warning_text = f"⚡ @{user.username or user.id} 灵台混沌未立誓！速诵『{self._config.init_phrase}』"
+            if message.text != config.init_phrase:
+                warning_text = f"⚡ @{user.username or user.id} 灵台混沌未立誓！速诵『{config.init_phrase}』"
                 warning = await reply(message, warning_text, parse_mode="MarkdownV2")
                 defer_delete(context.job_queue, warning, 10)
             return
 
-        if confirmed and self._config.daily_phrase not in message.text:
+        if confirmed and config.daily_phrase not in message.text:
             # 当日契约已成立，检查是否带有要求的内容
-            reminder_text = f"🐾 @{user.username or user.id} 忘了带尾音哦～要加『{self._config.daily_phrase}』哦～"
+            reminder_text = f"🐾 @{user.username or user.id} 忘了带尾音哦～要加『{config.daily_phrase}』哦～"
             reminder = await reply(message, reminder_text, parse_mode="MarkdownV2")
             defer_delete(context.job_queue, reminder, 10)
 

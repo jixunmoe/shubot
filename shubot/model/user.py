@@ -27,6 +27,8 @@ class CultivationRecord:
 
 
 class UserModel:
+    """通用用户相关模型"""
+
     _db: "DatabaseManager"
 
     def __init__(self, db: "DatabaseManager"):
