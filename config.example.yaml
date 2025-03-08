@@ -103,65 +103,109 @@ random_events:
     name: 上古遗迹
     chance: 0.002
 
-# 头衔设置
+# 修仙模块配置
 cultivation:
-  - 凡夫俗子
-  - 后天前期
-  - 后天中期
-  - 后天后期
-  - 先天前期
-  - 先天中期
-  - 先天后期
-  - 练气前期
-  - 练气中期
-  - 练气后期
-  - 筑基前期
-  - 筑基中期
-  - 筑基后期
-  - 金丹前期
-  - 金丹中期
-  - 金丹后期
-  - 元婴前期
-  - 元婴中期
-  - 元婴后期
-  - 化神前期
-  - 化神中期
-  - 化神后期
-  - 炼虚前期
-  - 炼虚中期
-  - 炼虚后期
-  - 合体前期
-  - 合体中期
-  - 合体后期
-  - 大乘前期
-  - 大乘中期
-  - 大乘后期
-  - 渡劫前期
-  - 渡劫中期
-  - 渡劫后期
+  # 大突破概率
+  major_level_up_chances:
+    - level: 3
+      chance: 1.0
+    - level: 6
+      chance: 0.9
+    - level: 9
+      chance: 0.8
+    - level: 12
+      chance: 0.7
+    - level: 15
+      chance: 0.6
+    - level: 18
+      chance: 0.5
+    - level: 21
+      chance: 0.4
+    - level: 24
+      chance: 0.3
+    - level: 27
+      chance: 0.2
+    - level: 30
+      chance: 0.1
 
-# 大突破概率
-major_breakthroughs:
-  - level: 3
-    chance: 1.0
-  - level: 6
-    chance: 0.9
-  - level: 9
-    chance: 0.8
-  - level: 12
-    chance: 0.7
-  - level: 15
-    chance: 0.6
-  - level: 18
-    chance: 0.5
-  - level: 21
-    chance: 0.4
-  - level: 24
-    chance: 0.3
-  - level: 27
-    chance: 0.2
-  - level: 30
-    chance: 0.1
+  # 头衔
+  names:
+    - 凡夫俗子
+    - 后天前期
+    - 后天中期
+    - 后天后期
+    - 先天前期
+    - 先天中期
+    - 先天后期
+    - 练气前期
+    - 练气中期
+    - 练气后期
+    - 筑基前期
+    - 筑基中期
+    - 筑基后期
+    - 金丹前期
+    - 金丹中期
+    - 金丹后期
+    - 元婴前期
+    - 元婴中期
+    - 元婴后期
+    - 化神前期
+    - 化神中期
+    - 化神后期
+    - 炼虚前期
+    - 炼虚中期
+    - 炼虚后期
+    - 合体前期
+    - 合体中期
+    - 合体后期
+    - 大乘前期
+    - 大乘中期
+    - 大乘后期
+    - 渡劫前期
+    - 渡劫中期
+    - 渡劫后期
+
+  # 大突破破境丹消耗
+  major_pill_cost: 1
+
+  messages:
+    account_missing: "🚫 你还没有修仙记录"
+    level_too_high: "🚫 天道桎梏，此方世界已无法容纳更高境界！"
+    insufficient_pts: |-
+      💸 突破《{stage}》需 {cost} 灵石
+      当前灵石：{points}（还需要 {missing} 枚）
+    insufficient_pills: |-
+      ⚠ 突破大境界需焚香沐浴，以【破境丹】护法！
+      当前破境丹：{pills} 枚（需 {cost} 枚）
+    breakthrough_success_header:
+      - "🌪️ 紫气东来三万里！{name}成功突破至《{next_stage}》！"
+      - "⚡ 雷云翻涌间，{name}的修为已臻《{next_stage}》！"
+      - "🌅 朝阳初升，{name} 沐浴晨晖踏入《{next_stage}》之境！"
+      - "🌌 星河倒悬，{name} 引动周天星力晋升《{next_stage}》！"
+      - "🗻 山岳共鸣！{name} 感悟地脉玄机突破至《{next_stage}》！"
+      - "🌀 灵气风暴中心，{name} 逆天改命成就《{next_stage}》！"
+      - "🌋 熔岩为浴，{name} 以地火淬体迈入《{next_stage}》阶段！"
+      - "❄️ 冰封千里的极寒中，{name} 明悟《{next_stage}》真谛！"
+      - "🌊 潮声如雷，{name} 借惊涛之势冲破《{next_stage}》桎梏！"
+      - "🎇 天花乱坠，{name} 顿悟天道法则臻至《{next_stage}》！"
+      - "🌩️ 九重雷劫下，{name} 涅槃重生踏入《{next_stage}》！"
+      - "🕳️ 虚空破碎，{name} 穿梭阴阳领悟《{next_stage}》玄奥！"
+      - "🌠 流星贯体，{name} 融合星核之力突破《{next_stage}》！"
+      - "🔥 焚尽心魔，{name} 于业火中证得《{next_stage}》大道！"
+      - "🌫️ 迷雾散尽，{name} 勘破轮回成就《{next_stage}》金身！"
+    breakthrough_success: |-
+      {header}
+      ▬▬▬▬▬▬▬▬▬▬
+      💰 消耗灵石 `{cost}`、丹药 `{pill_cost}` 枚
+      ⚡ 下境需求：`{next_cost}` 灵石
+    breakthrough_fail_reason:
+      - "心魔侵扰导致真元逆流"
+      - "天劫突然降临打断突破"
+    breakthrough_fail: |-
+      💥 {reason}，《{next_stage}》突破失败！
+      ▬▬▬▬▬▬▬▬▬▬
+      💔 走火入魔损失：{cost}灵石
+      💊 破境丹已消耗：{pills_taken}枚
 
 # 刮刮乐
 lottery:

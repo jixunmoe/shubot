@@ -5,6 +5,7 @@ from telegram import Bot, BotCommandScopeAllPrivateChats, BotCommand
 from telegram.ext import Application, JobQueue
 
 from shubot.command.checkin import CheckinCommand
+from shubot.command.cultivation import CultivationCommand
 from shubot.command.group_auth import GroupAuthCommand
 from shubot.command.lottery import LotteryCommand
 from shubot.command.user_info import UserInfoCommand
@@ -48,6 +49,7 @@ class ShuBot:
         self._command_handlers.append(RobCommand(self._app, config))
         self._command_handlers.append(LotteryCommand(self._app, config))
         self._command_handlers.append(WelcomeNewMemberCommand(self._app, config))
+        self._command_handlers.append(CultivationCommand(self._app, config))
 
         self._command_handlers.append(GroupAuthCommand(self._app, config))
 

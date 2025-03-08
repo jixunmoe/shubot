@@ -163,9 +163,75 @@ class BreakThroughConfig:
 
 
 def _default_major_breakthroughs() -> list[BreakThroughConfig]:
-    # 等级: 3, 6, 9, ...
-    # 概率: 1.0, 0.9, 0.8, ...
-    return [BreakThroughConfig(i * 3 + 3, 1.0 - 0.1 * i) for i in range(10)]
+    # 等级: 3, 6, 9, ..., 30
+    # 概率: 1.0, 0.9, 0.8, ..., 0.1
+    return [BreakThroughConfig(stage, round(1.1 - stage / 30.0, 5)) for stage in range(3, 31, 3)]
+
+
+def _get_default_cult_stage_names() -> list[str]:
+    return [
+        "凡夫俗子",
+        "后天前期",
+        "后天中期",
+        "后天后期",
+        "先天前期",
+        "先天中期",
+        "先天后期",
+        "练气前期",
+        "练气中期",
+        "练气后期",
+        "筑基前期",
+        "筑基中期",
+        "筑基后期",
+        "金丹前期",
+        "金丹中期",
+        "金丹后期",
+        "元婴前期",
+        "元婴中期",
+        "元婴后期",
+        "化神前期",
+        "化神中期",
+        "化神后期",
+        "炼虚前期",
+        "炼虚中期",
+        "炼虚后期",
+        "合体前期",
+        "合体中期",
+        "合体后期",
+        "大乘前期",
+        "大乘中期",
+        "大乘后期",
+        "渡劫前期",
+        "渡劫中期",
+        "渡劫后期",
+    ]
+
+
+@dataclass
+class CultivationMessages:
+    account_missing: str = field(default="❌ 未找到修仙数据")
+    level_too_high: str = field(default="❌ 等级满了！")
+    insufficient_pts: str = field(default="❌ 积分不足，需要 {cost} 积分，当前积分 {points}，还差 {missing} 积分")
+    insufficient_pills: str = field(default="❌ 丹药不足，需要 {cost} 枚，当前 {pills} 枚。")
+    breakthrough_success_header: list[str] = field(default_factory=lambda: ["🎉 突破成功！"])
+    breakthrough_success: str = field(
+        default="{header}\n消耗灵石：{cost}、丹药 {pill_cost} 枚。\n下一境界需要：{next_cost}"
+    )
+
+    breakthrough_fail_reason: list[str] = field(default_factory=lambda: ["🎉 突破失败！"])
+    breakthrough_fail: str = field(default="{reason}\n消耗灵石：{cost} / 丹药 {pill_cost} 枚，等级保持 {stage} 不变。")
+
+
+@dataclass
+class CultivationConfig:
+    major_level_up_chances: list[BreakThroughConfig] = field(default_factory=_default_major_breakthroughs)
+    """大突破配置"""
+    names: list[str] = field(default_factory=lambda: _get_default_cult_stage_names())
+    """境界名称列表"""
+    major_pill_cost: int = field(default=10)
+    """大突破消耗的突破丹数量"""
+    messages: CultivationMessages = field(default_factory=CultivationMessages)
+    """修仙模块消息配置"""
 
 
 @dataclass
@@ -267,10 +333,9 @@ class Config:
     gang: GangConfig = field(default_factory=GangConfig)
     """帮派模块配置"""
     random_events: list[RandomEventConfig] = field(default_factory=list)
-    cultivation: list[str] = field(default_factory=list)
-    """头衔列表"""
-    major_breakthroughs: list[BreakThroughConfig] = field(default_factory=_default_major_breakthroughs)
-    """大突破配置"""
+    """随机事件配置"""
+    cultivation: CultivationConfig = field(default_factory=CultivationConfig)
+    """修仙模块配置"""
     lottery: LotteryConfig = field(default_factory=LotteryConfig)
     """刮刮乐(乐透)配置"""
     leaderboard: LeaderboardConfig = field(default_factory=LeaderboardConfig)

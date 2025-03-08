@@ -1,9 +1,10 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, Any
+from typing import AsyncIterator, Any, AsyncGenerator
 
 import aiomysql
+from aiomysql import Connection
 
 from shubot.config import DatabaseConfig
 from shubot.model.group_auth import GroupAuthModel
@@ -53,8 +54,14 @@ class DatabaseManager:
     def get_pool(self) -> aiomysql.Pool:
         return self._pool
 
-    def acquire(self) -> aiomysql.Connection:
-        return self._pool.acquire()
+    @asynccontextmanager
+    async def acquire(self) -> AsyncGenerator[Connection, Any]:
+        async with self._pool.acquire() as conn:  # type: aiomysql.Connection
+            try:
+                yield conn
+            except Exception as e:
+                await conn.rollback()
+                raise e
 
     async def find_one(self, query: str, args: tuple[Any, ...] | None = None) -> Any:
         async with self.get_cursor() as cursor:

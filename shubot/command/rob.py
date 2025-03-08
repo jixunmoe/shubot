@@ -15,7 +15,7 @@ from telegram.ext.filters import ChatType
 from shubot.config import Config
 from shubot.database import DatabaseManager
 from shubot.ext.command import BotCommandHandlerMixin
-from shubot.model.user import CultivationRecord
+from shubot.ext.cult_helper import CultivationHelperMixin
 from shubot.util import reply as del_and_reply, defer_delete
 
 logger = logging.getLogger(__name__)
@@ -60,7 +60,7 @@ class RobActionPayload:
     loser_id: int
 
 
-class RobCommand(BotCommandHandlerMixin):
+class RobCommand(BotCommandHandlerMixin, CultivationHelperMixin):
     """打劫模块"""
 
     _app: Application
@@ -121,9 +121,9 @@ class RobCommand(BotCommandHandlerMixin):
         major_stage_delta = robber_cult.major_stage - victim_cult.major_stage
         tpl_var = dict(
             robber=robber_user.full_name,
-            robber_stage=self._cult_stage_name(robber_cult),
+            robber_stage=self._get_cult_stage_name(robber_cult.stage),
             victim=victim_user.full_name,
-            victim_stage=self._cult_stage_name(victim_cult),
+            victim_stage=self._get_cult_stage_name(victim_cult.stage),
         )
         if major_stage_delta < -1:
             return await self.reply(message, self._config.rob.messages.too_weak.format(**tpl_var))
@@ -245,10 +245,6 @@ class RobCommand(BotCommandHandlerMixin):
 
         if not sql_ok:
             await query.edit_message_text("🚫 未知错误，请联系管理员 (SQL Exception)")
-
-    def _cult_stage_name(self, cult: CultivationRecord) -> str:
-        """获取修仙等级名称"""
-        return self._config.cultivation[cult.stage] if 0 <= cult.stage < len(self._config.cultivation) else "未知等级"
 
     async def _try_rob(self, uid: int) -> tuple[RobResult, int]:
         async with self._db.acquire() as conn:

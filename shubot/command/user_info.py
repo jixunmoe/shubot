@@ -53,7 +53,7 @@ class UserInfoCommand(BotCommandHandlerMixin):
                 self._db.User.get_cultivation_data(user.id),
             )
             logger.info(f"修仙数据查询结果：{cult}")
-            stage_name = self._config.cultivation[cult.stage]
+            stage_name = self._config.cultivation.names[cult.stage]
 
             sent_msg = await self.reply(
                 message,
@@ -90,7 +90,7 @@ class UserInfoCommand(BotCommandHandlerMixin):
             entry = msgs.entry.format(
                 rank=rank,
                 name=escape_markdown(name, version=2),
-                stage=escape_markdown(self._config.cultivation[stage], version=2),
+                stage=escape_markdown(self._config.cultivation.names[stage], version=2),
                 points=points,
             )
             leaderboard_entries.append(entry.strip())
