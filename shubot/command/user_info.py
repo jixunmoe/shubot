@@ -1,10 +1,11 @@
 import asyncio
 import logging
-from functools import lru_cache, partial
+from functools import partial
 from math import copysign
 from textwrap import dedent
 from traceback import format_exception
 
+from async_lru import alru_cache
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram.ext.filters import ChatType
@@ -92,7 +93,7 @@ class UserInfoCommand(BotHelperMixin):
         leaderboard = f"{msgs.banner}\n\n{msgs.separator.join(leaderboard_entries)}\n\n{msgs.footer}"
         await self.reply(message, leaderboard, parse_mode="MarkdownV2", del_reply_timeout=60, del_source_timeout=0)
 
-    @lru_cache
+    @alru_cache
     async def _get_tg_name(self, uid: int, fallback: str = "侠名") -> str:
         try:
             user = await self.bot.get_chat(uid)

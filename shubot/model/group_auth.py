@@ -1,5 +1,6 @@
-from functools import lru_cache
 from typing import TYPE_CHECKING
+
+from async_lru import alru_cache
 
 if TYPE_CHECKING:
     from shubot.database import DatabaseManager
@@ -16,10 +17,10 @@ class GroupAuthModel:
     async def init(self):
         pass
 
-    @lru_cache(16)
+    @alru_cache(16)
     async def is_group_authorized(self, group_id: int):
         """检查群组是否已授权。该方法会缓存结果，以减少数据库查询次数来提高性能。"""
-        result = await self._db.find_one("SELECT 1 FROM authorized_groups WHERE group_id = %s", (group_id,))
+        result = await self._db.find_one("SELECT added_at FROM authorized_groups WHERE group_id = %s", (group_id,))
         return bool(result)
 
     async def set_group_auth(self, group_id: int, group_name: str = "", auth: bool = False):
@@ -31,15 +32,20 @@ class GroupAuthModel:
                     VALUES (%s, %s)
                     ON DUPLICATE KEY UPDATE
                         group_name = %s,
-                        added_at = UTC_TIMESTAMP()
+                        added_at = UTC_TIMESTAMP();
                 """,
                 (group_id, group_name, group_name),
             )
         else:
-            rowcount = await self._db.update("DELETE FROM authorized_groups WHERE group_id = %s", (group_id,))
+            rowcount = await self._db.update(
+                """
+                    DELETE FROM authorized_groups WHERE group_id = %s;
+                    """,
+                (group_id,),
+            )
 
         # 清除授权状态缓存
-        self.is_group_authorized.cache_clear()
+        self.is_group_authorized.cache_invalidate(group_id)
         return rowcount > 0
 
     async def allow_group(self, group_id: int, name: str):

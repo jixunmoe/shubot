@@ -126,7 +126,7 @@ class ShuBot:
             return
 
         group_id = message.chat.id
-        if not self._db.GroupAuth.is_group_authorized(group_id):
+        if not await self._db.GroupAuth.is_group_authorized(group_id):
             # 未授权的群组，忽略
             logger.warning(
                 f"未授权的群组: {group_id} " f"(user={message.from_user.id}, username={message.from_user.username})"

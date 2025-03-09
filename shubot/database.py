@@ -38,7 +38,7 @@ class DatabaseManager:
             user=config.user,
             password=config.password,
             db=config.db,
-            autocommit=False,
+            autocommit=True,
         )
         await asyncio.gather(
             self.User.init(),
