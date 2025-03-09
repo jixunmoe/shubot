@@ -6,21 +6,15 @@ from telegram.ext.filters import ChatType
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
-from shubot.ext.command import BotCommandHandlerMixin
+from shubot.ext.bot_helper import BotHelperMixin
 from shubot.util import reply, defer_delete
 
 CHECKIN_STAR_PATTERN = "⭐" * 5 + "✨" * 5
 
 
-class CheckinCommand(BotCommandHandlerMixin):
-    _app: Application
-    _config: Config
-    _db: DatabaseManager
-
+class CheckinCommand(BotHelperMixin):
     def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
-        self._db = db or DatabaseManager.get_instance()
-        self._app = app
-        self._config = config
+        super().__init__(app, config, db)
 
         self._app.add_handler(CommandHandler("checkin", self._handle_checkin, filters=ChatType.GROUPS))
 

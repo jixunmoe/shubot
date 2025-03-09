@@ -8,18 +8,12 @@ from telegram.helpers import escape_markdown
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
-from shubot.ext.command import BotCommandHandlerMixin
+from shubot.ext.bot_helper import BotHelperMixin
 
 
-class WelcomeNewMemberCommand(BotCommandHandlerMixin):
-    _app: Application
-    _config: Config
-    _db: DatabaseManager
-
+class WelcomeNewMemberCommand(BotHelperMixin):
     def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
-        self._db = db or DatabaseManager.get_instance()
-        self._app = app
-        self._config = config
+        super().__init__(app, config, db)
 
         app.add_handler(MessageHandler(StatusUpdate.NEW_CHAT_MEMBERS, self._welcome_new_member))
 

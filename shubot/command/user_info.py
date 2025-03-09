@@ -12,24 +12,18 @@ from telegram.helpers import escape_markdown
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
-from shubot.ext.command import BotCommandHandlerMixin
+from shubot.ext.bot_helper import BotHelperMixin
 
 logger = logging.getLogger(__name__)
 
 RANK_NUMBERS = "⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑⒒⒓⒔⒕⒖⒗⒘⒙⒚⒛"
 
 
-class UserInfoCommand(BotCommandHandlerMixin):
+class UserInfoCommand(BotHelperMixin):
     """查询当前用户状态"""
 
-    _app: Application
-    _config: Config
-    _db: DatabaseManager
-
     def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
-        self._db = db or DatabaseManager.get_instance()
-        self._app = app
-        self._config = config
+        super().__init__(app, config, db)
 
         self._app.add_handler(CommandHandler("my", self._handle_my, filters=ChatType.GROUPS))
         self._app.add_handler(
@@ -71,7 +65,7 @@ class UserInfoCommand(BotCommandHandlerMixin):
             )
 
         except Exception as e:
-            logger.error(f"查询积分失败：{str(e)} - {format_exception(e)}")
+            logger.error(f"查询积分失败：{str(e)}\n{'\n'.join(format_exception(e))}")
             await message.reply_text("❌ 查询积分失败，请稍后再试")
 
     async def _handle_ranking(self, update: Update, context: ContextTypes.DEFAULT_TYPE):

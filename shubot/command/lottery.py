@@ -10,7 +10,7 @@ from telegram.ext.filters import ChatType
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
-from shubot.ext.command import BotCommandHandlerMixin
+from shubot.ext.bot_helper import BotHelperMixin
 
 logger = logging.getLogger(__name__)
 
@@ -28,17 +28,11 @@ class LotteryUpdateStatus(enum.IntEnum):
     """成功"""
 
 
-class LotteryCommand(BotCommandHandlerMixin):
+class LotteryCommand(BotHelperMixin):
     """刮刮乐透"""
 
-    _app: Application
-    _config: Config
-    _db: DatabaseManager
-
     def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
-        self._db = db or DatabaseManager.get_instance()
-        self._app = app
-        self._config = config
+        super().__init__(app, config, db)
 
         self._app.add_handler(CommandHandler(["gua", "lottery"], self._handle_lottery, filters=ChatType.GROUPS))
         self._app.add_handler(CallbackQueryHandler(self._handle_lottery_entry, pattern=r"^lottery_"))

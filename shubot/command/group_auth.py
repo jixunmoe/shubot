@@ -1,5 +1,4 @@
 from functools import partial
-from textwrap import dedent
 
 from telegram import Update, User
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -8,22 +7,16 @@ from telegram.helpers import escape_markdown
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
-from shubot.ext.command import BotCommandHandlerMixin
+from shubot.ext.bot_helper import BotHelperMixin
 
 CHECKIN_STAR_PATTERN = "⭐" * 5 + "✨" * 5
 
 
-class GroupAuthCommand(BotCommandHandlerMixin):
+class GroupAuthCommand(BotHelperMixin):
     """群组授权指令，仅限管理员使用"""
 
-    _app: Application
-    _config: Config
-    _db: DatabaseManager
-
     def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
-        self._db = db or DatabaseManager.get_instance()
-        self._app = app
-        self._config = config
+        super().__init__(app, config, db)
 
         self._app.add_handler(
             CommandHandler("addgroup", partial(self._handle_group_auth, auth=True), filters=ChatType.GROUPS)

@@ -7,6 +7,7 @@ from telegram import Message, Bot, User
 from telegram.ext import Application, CallbackContext
 
 from shubot.config import Config
+from shubot.database import DatabaseManager
 
 
 async def _delete_message(ctx: CallbackContext):
@@ -14,10 +15,16 @@ async def _delete_message(ctx: CallbackContext):
     await ctx.bot.delete_message(**data)
 
 
-class BotCommandHandlerMixin:
+class BotHelperMixin:
     _app: Application
     _config: Config
     _rnd = SystemRandom()
+
+    def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
+        """初始化基础信息"""
+        self._app = app
+        self._config = config
+        self._db = db or DatabaseManager.get_instance()
 
     @property
     def bot(self) -> Bot:
@@ -39,6 +46,7 @@ class BotCommandHandlerMixin:
 
     async def init_db(self):
         """初始化数据库，子类可选实现此方法"""
+        pass
 
     def delete(self, message: Message, timeout: int = 10):
         self._app.job_queue.run_once(

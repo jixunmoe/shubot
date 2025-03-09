@@ -12,7 +12,7 @@ from telegram.helpers import escape_markdown
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
-from shubot.ext.command import BotCommandHandlerMixin
+from shubot.ext.bot_helper import BotHelperMixin
 from shubot.ext.cult_helper import CultivationHelperMixin
 
 logger = logging.getLogger(__name__)
@@ -33,15 +33,9 @@ class BreakThoughStatus(enum.IntEnum):
     """没有积分帐号"""
 
 
-class CultivationCommand(BotCommandHandlerMixin, CultivationHelperMixin):
-    _app: Application
-    _config: Config
-    _db: DatabaseManager
-
+class CultivationCommand(BotHelperMixin, CultivationHelperMixin):
     def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
-        self._db = db or DatabaseManager.get_instance()
-        self._app = app
-        self._config = config
+        super().__init__(app, config, db)
 
         self._app.add_handler(CommandHandler("breakthrough", self._handle_breakthrough, filters=ChatType.GROUPS))
 

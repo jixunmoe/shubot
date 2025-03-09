@@ -14,7 +14,7 @@ from telegram.ext.filters import ChatType
 
 from shubot.config import Config
 from shubot.database import DatabaseManager
-from shubot.ext.command import BotCommandHandlerMixin
+from shubot.ext.bot_helper import BotHelperMixin
 from shubot.ext.cult_helper import CultivationHelperMixin
 from shubot.util import reply as del_and_reply, defer_delete
 
@@ -60,17 +60,11 @@ class RobActionPayload:
     loser_id: int
 
 
-class RobCommand(BotCommandHandlerMixin, CultivationHelperMixin):
+class RobCommand(BotHelperMixin, CultivationHelperMixin):
     """打劫模块"""
 
-    _app: Application
-    _config: Config
-    _db: DatabaseManager
-
     def __init__(self, app: Application, config: Config, db: DatabaseManager | None = None):
-        self._db = db or DatabaseManager.get_instance()
-        self._app = app
-        self._config = config
+        super().__init__(app, config, db)
 
         self._app.add_handler(CommandHandler(["rob", "dajie"], self._handle_rob, filters=ChatType.GROUPS))
         self._app.add_handler(CallbackQueryHandler(self._handle_rob_action, pattern=r"^rob_"))

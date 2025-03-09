@@ -69,6 +69,8 @@ class BookConfig:
     """下载路径"""
     book_repo: BookRepoConfig
     """书库配置"""
+    book_repo_template: str = field(default="书库：{url} / 用户：`{username}` / 密码：`{password}` / 通知：{notice}")
+    """书库信息模板"""
     allowed_extensions: list[str] = field(default_factory=lambda: [".txt", ".epub"])
     """允许的文件扩展名"""
     points_per_book: int = field(default=10)

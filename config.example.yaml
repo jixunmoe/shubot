@@ -28,6 +28,12 @@ book:
     username: hesu
     password: aa1233
     notice: 请不要上传无关内容不要批量/打包下载
+  book_repo_template: |-
+    📚 书库信息（20秒后自动删除）
+    ├ 地址: {url}
+    ├ 账号: `{username}`
+    ├ 密码: `{password}`
+    └ 注意: {notice}
 
 # 猫娘模块
 salve_rules:
