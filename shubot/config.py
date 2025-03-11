@@ -311,6 +311,20 @@ class LeaderboardConfig:
 
 
 @dataclass
+class PassiveBoostConfig:
+    """被动聊天加分配置"""
+
+    chinese_count: int = field(default=3)
+    """中文字符数量"""
+
+    pill_chance: float = field(default=0.05)
+    """静默聊天时获得丹药的概率"""
+
+    pill_messages: list[str] = field(default_factory=lambda: ["🎉 恭喜 {name} 获得突破丹！"])
+    """获得丹药时的消息"""
+
+
+@dataclass
 class MiscMessages:
     """杂项消息配置"""
 
@@ -342,6 +356,8 @@ class Config:
     """刮刮乐(乐透)配置"""
     leaderboard: LeaderboardConfig = field(default_factory=LeaderboardConfig)
     """排行榜配置"""
+    passive_boost: PassiveBoostConfig = field(default_factory=PassiveBoostConfig)
+    """被动聊天加分配置"""
     region_names: dict[str, str] = field(default_factory=dict)
     """意义不明的区域 id 到名称的映射"""
     misc_messages: MiscMessages = field(default_factory=MiscMessages)

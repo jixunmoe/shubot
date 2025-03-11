@@ -20,6 +20,7 @@ from shubot.database import DatabaseManager
 from shubot.ext.bot_helper import BotHelperMixin
 from shubot.ext.group_msg_handler import GroupMsgHandlerMixin, GroupMessageHandleResult
 from shubot.group_msg.book_repo_info import BookRepoInfoHandler
+from shubot.group_msg.chat_boost import PassiveChatBoostHandler
 from shubot.group_msg.group_user_assoc import GroupUserAssocRegisterHandler
 
 logger = logging.getLogger(__name__)
@@ -70,6 +71,7 @@ class ShuBot:
         )
         self._group_message_handlers.append(GroupUserAssocRegisterHandler(self._app, config, self._db))
         self._group_message_handlers.append(BookRepoInfoHandler(self._app, config, self._db))
+        self._group_message_handlers.append(PassiveChatBoostHandler(self._app, config, self._db))
 
     async def _on_post_init(self, app: Application):
         logger.info("init db...")

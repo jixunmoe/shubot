@@ -67,6 +67,13 @@ class UserModel:
             raise ValueError("Failed to update points")
         return old_points, new_points
 
+    async def modify_pills(self, user_id: int, delta: int):
+        """修改用户的突破丹数量。若是新的数量为负数，则修改为 0。返回旧的和新的数量。"""
+        _, (status, old_pills, new_pills) = await self._db.call("shubot_common_user_update_pills", user_id, delta)
+        if status <= 0:
+            raise ValueError("Failed to update pills")
+        return old_pills, new_pills
+
     async def get_cultivation_data(self, user_id: int) -> CultivationRecord:
         """获取用户的修仙数据"""
         data = await self._db.find_one(
