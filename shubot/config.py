@@ -143,18 +143,6 @@ class GangConfig:
 
 
 @dataclass
-class RandomEventConfig:
-    """随机事件配置"""
-
-    id: str
-    """事件 ID"""
-    name: str
-    """事件名称"""
-    chance: float
-    """事件发生概率，取 0-1 之间的小数"""
-
-
-@dataclass
 class BreakThroughConfig:
     """突破事件配置"""
 
@@ -333,6 +321,30 @@ class MiscMessages:
 
 
 @dataclass
+class RandomEvent:
+    """单个随机事件配置"""
+
+    id: str
+    """事件 ID"""
+    name: str
+    """事件名称"""
+    chance: float
+    """事件发生概率，取 0-1 之间的小数"""
+
+
+@dataclass
+class RandomEventConfig:
+    """随机事件（奇遇）"""
+
+    lost_points: RandomEvent = field(
+        default_factory=lambda: RandomEvent(id="lost_points", name="灵石丢失", chance=0.005)
+    )
+    stage_up: RandomEvent = field(default_factory=lambda: RandomEvent(id="stage_up", name="小境界突破", chance=0.002))
+    stage_down: RandomEvent = field(default_factory=lambda: RandomEvent(id="stage_down", name="境界跌落", chance=0.003))
+    discovery: RandomEvent = field(default_factory=lambda: RandomEvent(id="discovery", name="上古遗迹", chance=0.002))
+
+
+@dataclass
 class Config:
     """总配置文件对象"""
 
@@ -348,7 +360,7 @@ class Config:
     """打劫模块配置"""
     gang: GangConfig = field(default_factory=GangConfig)
     """帮派模块配置"""
-    random_events: list[RandomEventConfig] = field(default_factory=list)
+    random_events: RandomEventConfig = field(default_factory=RandomEventConfig)
     """随机事件配置"""
     cultivation: CultivationConfig = field(default_factory=CultivationConfig)
     """修仙模块配置"""

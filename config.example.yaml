@@ -94,21 +94,6 @@ gang:
   reset_hour: 21
   reset_minute: 33
 
-# 随机事件
-random_events:
-  - id: "lost_points"
-    name: 灵石丢失
-    chance: 0.005
-  - id: "stage_up"
-    name: 小境界突破
-    chance: 0.002
-  - id: "stage_down"
-    name: 境界跌落
-    chance: 0.003
-  - id: "discovery"
-    name: 上古遗迹
-    chance: 0.002
-
 # 修仙模块配置
 cultivation:
   # 大突破概率
@@ -282,6 +267,20 @@ passive_boost:
     - "📜 破解古卷残篇，{name} 复原失传已久的突破丹！"
     - "🦚 凤凰涅槃时，{name} 采集真火余烬炼成突破丹！"
     - "💫 时空裂隙乍现，{name} 夺取混沌之气凝结突破丹！"
+
+random_events:
+  lost_points:
+    name: 灵石丢失
+    chance: 0.005
+  stage_up:
+    name: 小境界突破
+    chance: 0.002
+  stage_down:
+    name: 境界跌落
+    chance: 0.003
+  discovery:
+    name: 上古遗迹
+    chance: 0.002
 
 region_names:
   hk: 香港
