@@ -8,6 +8,8 @@ from shubot.ext.group_msg_handler import GroupMsgHandlerMixin
 
 
 class GroupUserAssocRegisterHandler(GroupMsgHandlerMixin):
+    """注册用户在群组中的身份，并进行关联。"""
+
     async def handle_group_msg(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = cast(Message, update.message)
         user_id = message.from_user.id
